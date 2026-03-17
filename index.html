@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-     <!-- iPhone Safari用 (Webクリップアイコン) -->
+    <!-- iPhone Safari用 (Webクリップアイコン) -->
     <link rel="apple-touch-icon" href="apple-touch-icon.png" sizes="180x180">
     <!-- Android Chrome用 (ホーム画面ショートカット/PWAアイコン) -->
     <link rel="icon" href="android-chrome-192.png" sizes="192x192" type="image/png">
@@ -83,7 +83,7 @@
     <div class="lg:w-80 w-full bg-white border-b lg:border-r border-slate-300 p-5 shadow-sm">
         <div class="flex items-center justify-between mb-6">
             <h2 class="text-xl font-black border-b-4 border-slate-800 pb-1">ダクト設定</h2>
-            <span class="bg-slate-100 text-slate-500 text-[10px] px-2 py-1 rounded">Ver 3.3</span>
+            <span class="bg-slate-100 text-slate-500 text-[10px] px-2 py-1 rounded">Ver 3.4</span>
         </div>
         
         <div class="space-y-5">
@@ -341,7 +341,6 @@
             const dpr = window.devicePixelRatio || 1;
             const rect = canvas.parentElement.getBoundingClientRect();
             
-            // サイズリセットとスケーリング
             canvas.width = rect.width * dpr;
             canvas.height = rect.height * dpr;
             ctx.scale(dpr, dpr);
@@ -389,31 +388,59 @@
             const ectx = exportCanvas.getContext('2d');
             
             exportCanvas.width = 1000;
-            exportCanvas.height = 1400;
+            exportCanvas.height = 1450;
             ectx.fillStyle = "#ffffff";
-            ectx.fillRect(0, 0, 1000, 1400);
+            ectx.fillRect(0, 0, 1000, 1450);
             
+            // ヘッダー
             ectx.fillStyle = "#0f172a";
             ectx.fillRect(0,0,1000,100);
             ectx.fillStyle = "#ffffff";
-            ectx.font = "bold 30px sans-serif";
+            ectx.font = "bold 32px sans-serif";
             ectx.fillText("製作仕様書: 角ダクト振れ管", 40, 60);
 
-            ectx.fillStyle = "#1e293b";
-            ectx.font = "bold 18px sans-serif";
-            ectx.fillText(`A面:${p.w1}×${p.h1}  B面:${p.w2}×${p.h2}  L:${p.L}`, 40, 150);
+            // スペック情報エリア
+            ectx.fillStyle = "#f8fafc";
+            ectx.fillRect(40, 120, 920, 120);
+            ectx.strokeStyle = "#e2e8f0";
+            ectx.lineWidth = 1;
+            ectx.strokeRect(40, 120, 920, 120);
 
-            // 簡易描画をエクスポート
+            // 基本寸法
+            ectx.fillStyle = "#1e293b";
+            ectx.font = "bold 20px sans-serif";
+            ectx.fillText(`基本寸法: A面 ${p.w1}×${p.h1} / B面 ${p.w2}×${p.h2} / 全長 L=${p.L}`, 60, 165);
+
+            // 振れ情報の構築
+            const labelsY = { top: '天', center: '芯', bottom: '底' };
+            const labelsDirY = { up: '上げ', down: '下げ' };
+            const labelsX = { left: '左', center: '芯', right: '右' };
+            const labelsDirX = { left: '左へ', right: '右へ' };
+
+            const textY = `縦振れ: ${labelsY[state.baseY]}基準で ${p.offY} ${labelsDirY[state.dirY]}`;
+            const textX = `横振れ: ${labelsX[state.baseX]}基準で ${p.offX} ${labelsDirX[state.dirX]}`;
+
+            ectx.fillStyle = "#475569";
+            ectx.font = "18px sans-serif";
+            ectx.fillText(`${textY}  |  ${textX}`, 60, 205);
+
+            // 各図面の描画
             const drawEx = (x,y,w,h,fn) => {
                 ectx.save(); ectx.translate(x,y); 
-                ectx.strokeStyle="#ccc"; ectx.strokeRect(0,0,w,h);
+                ectx.strokeStyle="#f1f5f9"; ectx.lineWidth = 2; ectx.strokeRect(0,0,w,h);
                 const sc = Math.min(w,h) / (Math.max(p.w1,p.w2,p.h1,p.h2,p.L,p.offX,p.offY)*3);
                 fn(ectx,w,h,sc); ectx.restore();
             };
 
-            drawEx(50,200,430,400,(ctx,w,h,sc)=>drawTop(ctx,w,h,sc,p,cox,coy));
-            drawEx(520,200,430,400,(ctx,w,h,sc)=>drawFront(ctx,w,h,sc,p,cox,coy));
-            drawEx(50,650,900,600,(ctx,w,h,sc)=>drawSide(ctx,w,h,sc,p,coy));
+            drawEx(50,280,430,400,(ctx,w,h,sc)=>drawTop(ctx,w,h,sc,p,cox,coy));
+            drawEx(520,280,430,400,(ctx,w,h,sc)=>drawFront(ctx,w,h,sc,p,cox,coy));
+            drawEx(50,730,900,600,(ctx,w,h,sc)=>drawSide(ctx,w,h,sc,p,coy));
+
+            // フッター
+            ectx.fillStyle = "#94a3b8";
+            ectx.font = "14px sans-serif";
+            const dateStr = new Date().toLocaleString('ja-JP');
+            ectx.fillText(`生成日時: ${dateStr}`, 40, 1400);
 
             document.getElementById('previewImage').src = exportCanvas.toDataURL('image/png');
             document.getElementById('previewModal').classList.add('active');
@@ -425,7 +452,6 @@
         }
     }
 
-    // 全てのinputにイベントを付与
     document.querySelectorAll('input').forEach(input => {
         input.addEventListener('input', drawAll);
     });
