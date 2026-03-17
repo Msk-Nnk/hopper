@@ -50,8 +50,21 @@
         }
         .tab-btn.active { background: #0f172a; color: white; border-color: #0f172a; }
         .tab-group { display: flex; border-radius: 6px; overflow: hidden; margin-bottom: 6px; }
-        section { margin-bottom: 1.25rem; }
         
+        /* モーダルアニメーション */
+        #previewModal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 100;
+            padding: 20px;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        #previewModal.active { display: flex; }
+
         .loading-dots:after {
             content: '.';
             animation: dots 1s steps(5, end) infinite;
@@ -71,7 +84,7 @@
     <div class="lg:w-80 w-full bg-white border-b lg:border-r border-slate-300 p-5 shadow-sm z-20 overflow-y-auto lg:max-h-screen">
         <div class="flex items-center justify-between mb-6">
             <h2 class="text-xl font-black border-b-4 border-slate-800 pb-1">ダクト設定</h2>
-            <span class="bg-slate-100 text-slate-500 text-[10px] px-2 py-1 rounded">Ver 2.5</span>
+            <span class="bg-slate-100 text-slate-500 text-[10px] px-2 py-1 rounded">Ver 3.0</span>
         </div>
         
         <div class="space-y-5">
@@ -131,7 +144,7 @@
             <div class="pt-4 pb-8">
                 <button id="saveBtn" onclick="exportOrderImage()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-4 px-6 rounded-xl flex items-center justify-center transition-all shadow-xl active:scale-95">
                     <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                    画像を保存
+                    画像を生成して保存
                 </button>
             </div>
         </div>
@@ -141,31 +154,37 @@
     <div class="flex-1 p-4 bg-slate-100 space-y-6 overflow-y-auto">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="flex flex-col">
-                <div class="flex justify-between items-end mb-2">
-                    <span class="text-xs font-black text-slate-700 uppercase tracking-widest">平面図 (Top View)</span>
-                </div>
+                <span class="text-xs font-black text-slate-700 uppercase tracking-widest mb-2">平面図</span>
                 <div class="aspect-square">
                     <canvas id="topView"></canvas>
                 </div>
             </div>
             <div class="flex flex-col">
-                <div class="flex justify-between items-end mb-2">
-                    <span class="text-xs font-black text-slate-700 uppercase tracking-widest">正面図 (Front View)</span>
-                </div>
+                <span class="text-xs font-black text-slate-700 uppercase tracking-widest mb-2">正面図</span>
                 <div class="aspect-square">
                     <canvas id="frontView"></canvas>
                 </div>
             </div>
         </div>
         <div class="flex flex-col pb-10">
-            <div class="flex justify-between items-end mb-2">
-                <span class="text-xs font-black text-slate-700 uppercase tracking-widest">側面図 (Side View)</span>
-            </div>
-            <div class="h-[400px]">
+            <span class="text-xs font-black text-slate-700 uppercase tracking-widest mb-2">側面図</span>
+            <div class="h-[300px] md:h-[400px]">
                 <canvas id="sideView"></canvas>
             </div>
         </div>
     </div>
+</div>
+
+<!-- スマホ保存用プレビューモーダル -->
+<div id="previewModal">
+    <div class="text-white text-center mb-4">
+        <p class="font-bold text-lg">画像が生成されました</p>
+        <p class="text-sm opacity-80">カメラロールに保存するには、<br><span class="text-yellow-400 font-bold underline">画像を長押し</span>して「写真を保存」を選んでください</p>
+    </div>
+    <div class="relative max-w-full max-h-[70vh] overflow-auto bg-white rounded-lg shadow-2xl">
+        <img id="previewImage" class="max-w-full h-auto select-none" alt="生成された画像">
+    </div>
+    <button onclick="closeModal()" class="mt-8 bg-white/20 hover:bg-white/30 text-white px-8 py-3 rounded-full font-bold border border-white/50 backdrop-blur-sm">閉じる</button>
 </div>
 
 <canvas id="exportCanvas" style="display:none;"></canvas>
@@ -215,7 +234,7 @@
     }
 
     function drawTick(ctx, x, y, angle) {
-        const size = 7;
+        const size = 6;
         const slashAngle = angle + Math.PI / 4; 
         ctx.beginPath();
         ctx.moveTo(x - size * Math.cos(slashAngle), y - size * Math.sin(slashAngle));
@@ -339,26 +358,19 @@
         const ctx = canvas.getContext('2d');
         const dpr = window.devicePixelRatio || 1;
         const rect = canvas.parentElement.getBoundingClientRect();
-        
-        // CSS上の表示サイズをセット
         canvas.style.width = rect.width + "px";
         canvas.style.height = rect.height + "px";
-        
-        // バッファサイズをデバイス解像度に合わせる
         canvas.width = rect.width * dpr;
         canvas.height = rect.height * dpr;
-        
         ctx.resetTransform();
         ctx.scale(dpr, dpr);
         ctx.clearRect(0, 0, rect.width, rect.height);
-        
         const p = getParams();
         const { cox, coy } = calculateOffsets(p);
         const boxW = Math.max(p.w1, p.w2, Math.abs(cox) + (p.w1+p.w2)/2, p.L);
         const boxH = Math.max(p.h1, p.h2, Math.abs(coy) + (p.h1+p.h2)/2, p.L);
         const margin = (type === 'side') ? 3.0 : 2.5;
         const sc = Math.min(rect.width, rect.height) / (Math.max(boxW, boxH) * margin);
-        
         drawFn(ctx, rect.width, rect.height, sc);
     }
 
@@ -368,11 +380,15 @@
         render('sideView', (ctx, w, h, sc) => drawSide(ctx, w, h, sc, getParams(), calculateOffsets(getParams()).coy), 'side');
     }
 
+    function closeModal() {
+        document.getElementById('previewModal').classList.remove('active');
+    }
+
     async function exportOrderImage() {
         const btn = document.getElementById('saveBtn');
         const originalHtml = btn.innerHTML;
         btn.disabled = true;
-        btn.innerHTML = `<span class="loading-dots">保存中</span>`;
+        btn.innerHTML = `<span class="loading-dots">画像を生成中</span>`;
 
         try {
             await new Promise(r => setTimeout(r, 100));
@@ -381,13 +397,11 @@
             const exportCanvas = document.getElementById('exportCanvas');
             const ectx = exportCanvas.getContext('2d');
             
-            // 書き出し用解像度を固定（1200x1650）
             exportCanvas.width = 1200;
             exportCanvas.height = 1650;
             ectx.fillStyle = "#ffffff";
             ectx.fillRect(0, 0, 1200, 1650);
             
-            // ヘッダー
             ectx.fillStyle = "#0f172a";
             ectx.fillRect(0, 0, 1200, 120);
             ectx.fillStyle = "#ffffff";
@@ -398,7 +412,6 @@
             ectx.fillText(`発行: ${new Date().toLocaleString('ja-JP')}`, 1150, 75);
             ectx.textAlign = "left";
 
-            // 情報欄
             ectx.fillStyle = "#f8fafc";
             ectx.fillRect(50, 150, 1100, 180);
             ectx.strokeStyle = "#cbd5e1";
@@ -417,13 +430,11 @@
             ectx.fillText(`横振れ(X): ${labels.baseX[state.baseX]} / ${p.offX} / ${labels.dirX[state.dirX]}`, 80, 280);
             ectx.fillText(`縦振れ(Y): ${labels.baseY[state.baseY]} / ${p.offY} / ${labels.dirY[state.dirY]}`, 550, 280);
 
-            // 書き出し用スケーリング (固定幅に基づいて計算)
             const drawOnExport = (id, x, y, w, h, type, drawFn) => {
                 ectx.save();
                 ectx.translate(x, y);
                 ectx.strokeStyle = "#e2e8f0";
                 ectx.strokeRect(0, 0, w, h);
-                // 書き出し時専用のスケール計算
                 const boxW = Math.max(p.w1, p.w2, Math.abs(cox) + (p.w1+p.w2)/2, p.L);
                 const boxH = Math.max(p.h1, p.h2, Math.abs(coy) + (p.h1+p.h2)/2, p.L);
                 const margin = (type === 'side') ? 3.0 : 2.5;
@@ -439,11 +450,17 @@
             drawOnExport('front', 615, 400, 535, 450, 'front', (ctx, w, h, sc) => drawFront(ctx, w, h, sc, p, cox, coy));
             drawOnExport('side', 50, 930, 1100, 650, 'side', (ctx, w, h, sc) => drawSide(ctx, w, h, sc, p, coy));
 
+            // 画像を表示
             const dataUrl = exportCanvas.toDataURL('image/png');
+            document.getElementById('previewImage').src = dataUrl;
+            document.getElementById('previewModal').classList.add('active');
+
+            // 自動ダウンロードも並行して実行
             const link = document.createElement('a');
             link.href = dataUrl;
             link.download = `duct_spec_${Date.now()}.png`;
             link.click();
+            
         } catch (err) {
             console.error(err);
         } finally {
