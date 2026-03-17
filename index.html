@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-     <!-- iPhone Safari用 (Webクリップアイコン) -->
+    <!-- iPhone Safari用 (Webクリップアイコン) -->
     <link rel="apple-touch-icon" href="apple-touch-icon.png" sizes="180x180">
     <!-- Android Chrome用 (ホーム画面ショートカット/PWAアイコン) -->
     <link rel="icon" href="android-chrome-192.png" sizes="192x192" type="image/png">
@@ -67,11 +67,11 @@
 <body class="text-slate-900 text-sm">
 
 <div class="flex flex-col lg:flex-row min-h-screen">
-    <!-- Configuration Panel -->
+    <!-- 設定パネル -->
     <div class="lg:w-80 w-full bg-white border-b lg:border-r border-slate-300 p-5 shadow-sm z-20 overflow-y-auto lg:max-h-screen">
         <div class="flex items-center justify-between mb-6">
             <h2 class="text-xl font-black border-b-4 border-slate-800 pb-1">ダクト設定</h2>
-            <span class="bg-slate-100 text-slate-500 text-[10px] px-2 py-1 rounded">Ver 2.4</span>
+            <span class="bg-slate-100 text-slate-500 text-[10px] px-2 py-1 rounded">Ver 2.5</span>
         </div>
         
         <div class="space-y-5">
@@ -131,20 +131,20 @@
             <div class="pt-4 pb-8">
                 <button id="saveBtn" onclick="exportOrderImage()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-4 px-6 rounded-xl flex items-center justify-center transition-all shadow-xl active:scale-95">
                     <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                    製作仕様書を保存
+                    画像を保存
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Main Canvas Area -->
+    <!-- メイン表示エリア -->
     <div class="flex-1 p-4 bg-slate-100 space-y-6 overflow-y-auto">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="flex flex-col">
                 <div class="flex justify-between items-end mb-2">
                     <span class="text-xs font-black text-slate-700 uppercase tracking-widest">平面図 (Top View)</span>
                 </div>
-                <div class="aspect-square md:aspect-auto md:h-[450px]">
+                <div class="aspect-square">
                     <canvas id="topView"></canvas>
                 </div>
             </div>
@@ -152,7 +152,7 @@
                 <div class="flex justify-between items-end mb-2">
                     <span class="text-xs font-black text-slate-700 uppercase tracking-widest">正面図 (Front View)</span>
                 </div>
-                <div class="aspect-square md:aspect-auto md:h-[450px]">
+                <div class="aspect-square">
                     <canvas id="frontView"></canvas>
                 </div>
             </div>
@@ -161,14 +161,13 @@
             <div class="flex justify-between items-end mb-2">
                 <span class="text-xs font-black text-slate-700 uppercase tracking-widest">側面図 (Side View)</span>
             </div>
-            <div class="h-[400px] md:h-[500px]">
+            <div class="h-[400px]">
                 <canvas id="sideView"></canvas>
             </div>
         </div>
     </div>
 </div>
 
-<!-- 非表示の書き出し用キャンバス -->
 <canvas id="exportCanvas" style="display:none;"></canvas>
 
 <script>
@@ -178,14 +177,13 @@
         state[key] = val;
         const parent = document.getElementById(key);
         parent.querySelectorAll('.tab-btn').forEach(b => {
-            const txt = b.textContent;
             const labels = {
                 baseY: { top: '天', center: '芯', bottom: '底' },
                 dirY: { up: '上げ', down: '下げ' },
                 baseX: { left: '左', center: '芯', right: '右' },
                 dirX: { left: '左へ', right: '右へ' }
             };
-            b.classList.toggle('active', txt === labels[key][val]);
+            b.classList.toggle('active', b.textContent === labels[key][val]);
         });
         drawAll();
     }
@@ -242,15 +240,11 @@
         const padding = 3;
         const bgW = metrics.width + padding * 4;
         const bgH = 16;
-        
         ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
         let startX = x;
         if (align === "center") startX = x - bgW / 2;
         else if (align === "right") startX = x - bgW;
-        else if (align === "left") startX = x;
-
         ctx.fillRect(startX, y - bgH/2 - 2, bgW, bgH);
-        
         ctx.fillStyle = color;
         ctx.textAlign = align;
         ctx.fillText(text, x, y + 5);
@@ -262,7 +256,6 @@
         ctx.setLineDash([]);
         ctx.strokeStyle = "#64748b";
         ctx.lineWidth = 1;
-
         if (!isVertical) {
             ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x1, y1 + offset); ctx.stroke();
             ctx.beginPath(); ctx.moveTo(x2, y2); ctx.lineTo(x2, y2 + offset); ctx.stroke();
@@ -277,243 +270,190 @@
         ctx.restore();
     }
 
-    function drawAll() {
-        const p = getParams();
-        const { cox, coy } = calculateOffsets(p);
-        render('topView', (ctx, w, h, sc) => drawTop(ctx, w, h, sc, p, cox, coy), 'top');
-        render('frontView', (ctx, w, h, sc) => drawFront(ctx, w, h, sc, p, cox, coy), 'front');
-        render('sideView', (ctx, w, h, sc) => drawSide(ctx, w, h, sc, p, coy), 'side');
+    function drawTop(ctx, w, h, sc, p, cox, coy) {
+        const cx = w/2 + (cox*sc)/2;
+        const cy = h/2;
+        const y_b = cy - (p.L/2)*sc, y_a = cy + (p.L/2)*sc;
+        const x1_a = cx - cox*sc - (p.w1/2)*sc, x2_a = cx - cox*sc + (p.w1/2)*sc;
+        const x3_b = cx - (p.w2/2)*sc, x4_b = cx + (p.w2/2)*sc;
+        ctx.beginPath(); ctx.lineWidth = 1.5; ctx.strokeStyle = "#1e293b";
+        ctx.moveTo(x1_a, y_a); ctx.lineTo(x2_a, y_a); ctx.lineTo(x4_b, y_b); ctx.lineTo(x3_b, y_b); ctx.closePath(); 
+        ctx.fillStyle = "#f8fafc"; ctx.fill(); ctx.stroke();
+        ctx.lineWidth = 4; ctx.strokeStyle = "#2563eb"; ctx.beginPath(); ctx.moveTo(x1_a, y_a); ctx.lineTo(x2_a, y_a); ctx.stroke();
+        ctx.strokeStyle = "#ea580c"; ctx.beginPath(); ctx.moveTo(x3_b, y_b); ctx.lineTo(x4_b, y_b); ctx.stroke();
+        drawDim(ctx, x1_a, y_a, x2_a, y_a, `A幅:${p.w1}`, 45);
+        drawDim(ctx, x3_b, y_b, x4_b, y_b, `B幅:${p.w2}`, -45);
+        drawDim(ctx, x2_a, y_a, x2_a, y_b, `L:${p.L}`, 65, true);
+        let rA = state.baseX === 'left' ? x1_a : (state.baseX === 'right' ? x2_a : (x1_a+x2_a)/2);
+        let rB = state.baseX === 'left' ? x3_b : (state.baseX === 'right' ? x4_b : (x3_b+x4_b)/2);
+        ctx.save(); ctx.lineWidth = 1; ctx.setLineDash([4, 4]); ctx.strokeStyle = "#94a3b8";
+        ctx.beginPath(); ctx.moveTo(rA, y_a); ctx.lineTo(rA, y_a + 95); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(rB, y_b); ctx.lineTo(rB, y_a + 95); ctx.stroke();
+        ctx.setLineDash([]); ctx.strokeStyle = "#dc2626"; 
+        drawSlashDimLine(ctx, rA, y_a + 90, rB, y_a + 90);
+        drawTextWithBg(ctx, `横振れ:${p.offX}`, (rA+rB)/2, y_a + 90, "#dc2626");
+        ctx.restore();
+    }
+
+    function drawFront(ctx, w, h, sc, p, cox, coy) {
+        const cx = w/2 - (cox*sc)/2, cy = h/2 - (coy*sc)/2;
+        const xA = cx - (p.w1/2)*sc, yA = cy - (p.h1/2)*sc;
+        const xB = cx + (cox - p.w2/2)*sc, yB = cy + (coy - p.h2/2)*sc;
+        ctx.lineWidth = 2.5; ctx.strokeStyle = "#2563eb"; ctx.strokeRect(xA, yA, p.w1*sc, p.h1*sc);
+        drawTextWithBg(ctx, `A:${p.w1}×${p.h1}`, xA + (p.w1*sc)/2, yA + (p.h1*sc)/2, "#2563eb");
+        ctx.setLineDash([6,4]); ctx.strokeStyle = "#ea580c"; ctx.strokeRect(xB, yB, p.w2*sc, p.h2*sc);
+        ctx.setLineDash([]); drawTextWithBg(ctx, `B:${p.w2}×${p.h2}`, xB + (p.w2*sc)/2, yB + (p.h2*sc)/2, "#ea580c");
+    }
+
+    function drawSide(ctx, w, h, sc, p, coy) {
+        const cx = w/2 - (p.L/2)*sc - 50, cy = h/2 - (coy*sc)/2;
+        const x_a = cx, x_b = cx + p.L*sc;
+        const y1_a_top = cy - (p.h1/2)*sc, y2_a_btm = cy + (p.h1/2)*sc;
+        const y3_b_top = cy + (coy - p.h2/2)*sc, y4_b_btm = cy + (coy + p.h2/2)*sc;
+        ctx.beginPath(); ctx.lineWidth = 1.5; ctx.strokeStyle = "#1e293b";
+        ctx.moveTo(x_a, y1_a_top); ctx.lineTo(x_a, y2_a_btm); ctx.lineTo(x_b, y4_b_btm); ctx.lineTo(x_b, y3_b_top); ctx.closePath(); 
+        ctx.fillStyle = "#f8fafc"; ctx.fill(); ctx.stroke();
+        ctx.lineWidth = 4; ctx.strokeStyle = "#2563eb"; ctx.beginPath(); ctx.moveTo(x_a, y1_a_top); ctx.lineTo(x_a, y2_a_btm); ctx.stroke();
+        ctx.strokeStyle = "#ea580c"; ctx.beginPath(); ctx.moveTo(x_b, y3_b_top); ctx.lineTo(x_b, y4_b_btm); ctx.stroke();
+        drawDim(ctx, x_a, y1_a_top, x_a, y2_a_btm, `A高:${p.h1}`, -55, true);
+        drawDim(ctx, x_b, y3_b_top, x_b, y4_b_btm, `B高:${p.h2}`, 55, true);
+        const baselineY = Math.max(y2_a_btm, y4_b_btm) + 70;
+        ctx.setLineDash([]); ctx.strokeStyle = "#475569"; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(x_a, y2_a_btm); ctx.lineTo(x_a, baselineY + 10); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x_b, y4_b_btm); ctx.lineTo(x_b, baselineY + 10); ctx.stroke();
+        drawSlashDimLine(ctx, x_a, baselineY, x_b, baselineY);
+        drawTextWithBg(ctx, `L:${p.L}`, (x_a + x_b) / 2, baselineY);
+        let rYA = state.baseY === 'top' ? y1_a_top : (state.baseY === 'bottom' ? y2_a_btm : (y1_a_top+y2_a_btm)/2);
+        let rYB = state.baseY === 'top' ? y3_b_top : (state.baseY === 'bottom' ? y4_b_btm : (y3_b_top+y4_b_btm)/2);
+        const labelX = x_b + 80;
+        ctx.save(); ctx.lineWidth = 1; ctx.setLineDash([4, 4]); ctx.strokeStyle = "#94a3b8";
+        ctx.beginPath(); ctx.moveTo(x_a, rYA); ctx.lineTo(labelX, rYA); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x_b, rYB); ctx.lineTo(labelX, rYB); ctx.stroke();
+        ctx.setLineDash([]); ctx.strokeStyle = "#dc2626"; drawSlashDimLine(ctx, labelX - 5, rYA, labelX - 5, rYB);
+        drawTextWithBg(ctx, `縦振れ:${p.offY}`, labelX, (rYA+rYB)/2, "#dc2626", "left");
+        ctx.restore();
     }
 
     function render(id, drawFn, type) {
         const canvas = document.getElementById(id);
         const ctx = canvas.getContext('2d');
         const dpr = window.devicePixelRatio || 1;
-        const rect = canvas.getBoundingClientRect();
+        const rect = canvas.parentElement.getBoundingClientRect();
         
+        // CSS上の表示サイズをセット
+        canvas.style.width = rect.width + "px";
+        canvas.style.height = rect.height + "px";
+        
+        // バッファサイズをデバイス解像度に合わせる
         canvas.width = rect.width * dpr;
         canvas.height = rect.height * dpr;
+        
+        ctx.resetTransform();
         ctx.scale(dpr, dpr);
         ctx.clearRect(0, 0, rect.width, rect.height);
         
         const p = getParams();
         const { cox, coy } = calculateOffsets(p);
-        
-        const boxW = Math.max(p.w1, p.w2, Math.abs(cox) + p.w1/2 + p.w2/2, p.L);
-        const boxH = Math.max(p.h1, p.h2, Math.abs(coy) + p.h1/2 + p.h2/2, p.L);
-        
-        const margin = (type === 'side') ? 2.8 : 2.2;
-        const sc = (Math.min(rect.width, rect.height) / (Math.max(boxW, boxH) * margin));
+        const boxW = Math.max(p.w1, p.w2, Math.abs(cox) + (p.w1+p.w2)/2, p.L);
+        const boxH = Math.max(p.h1, p.h2, Math.abs(coy) + (p.h1+p.h2)/2, p.L);
+        const margin = (type === 'side') ? 3.0 : 2.5;
+        const sc = Math.min(rect.width, rect.height) / (Math.max(boxW, boxH) * margin);
         
         drawFn(ctx, rect.width, rect.height, sc);
     }
 
-    function drawTop(ctx, w, h, sc, p, cox, coy) {
-        const cx = w/2 + (cox*sc)/2;
-        const cy = h/2;
-        const y_b = cy - (p.L/2)*sc;
-        const y_a = cy + (p.L/2)*sc;
-        const x1_a = cx - cox*sc - (p.w1/2)*sc, x2_a = cx - cox*sc + (p.w1/2)*sc;
-        const x3_b = cx - (p.w2/2)*sc, x4_b = cx + (p.w2/2)*sc;
-
-        ctx.beginPath(); ctx.lineWidth = 1.5; ctx.strokeStyle = "#1e293b";
-        ctx.moveTo(x1_a, y_a); ctx.lineTo(x2_a, y_a); ctx.lineTo(x4_b, y_b); ctx.lineTo(x3_b, y_b); ctx.closePath(); 
-        ctx.fillStyle = "#f8fafc"; ctx.fill(); ctx.stroke();
-        
-        ctx.lineWidth = 4; 
-        ctx.strokeStyle = "#2563eb"; ctx.beginPath(); ctx.moveTo(x1_a, y_a); ctx.lineTo(x2_a, y_a); ctx.stroke();
-        ctx.strokeStyle = "#ea580c"; ctx.beginPath(); ctx.moveTo(x3_b, y_b); ctx.lineTo(x4_b, y_b); ctx.stroke();
-
-        drawDim(ctx, x1_a, y_a, x2_a, y_a, `A面幅: ${p.w1}`, 45);
-        drawDim(ctx, x3_b, y_b, x4_b, y_b, `B面幅: ${p.w2}`, -45);
-        drawDim(ctx, x2_a, y_a, x2_a, y_b, `全長 L: ${p.L}`, 65, true);
-
-        let rA = state.baseX === 'left' ? x1_a : (state.baseX === 'right' ? x2_a : (x1_a+x2_a)/2);
-        let rB = state.baseX === 'left' ? x3_b : (state.baseX === 'right' ? x4_b : (x3_b+x4_b)/2);
-
-        ctx.save();
-        ctx.lineWidth = 1;
-        ctx.setLineDash([4, 4]); ctx.strokeStyle = "#94a3b8";
-        ctx.beginPath(); ctx.moveTo(rA, y_a); ctx.lineTo(rA, y_a + 95); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(rB, y_b); ctx.lineTo(rB, y_a + 95); ctx.stroke();
-        
-        ctx.setLineDash([]); ctx.strokeStyle = "#dc2626"; 
-        drawSlashDimLine(ctx, rA, y_a + 90, rB, y_a + 90);
-        drawTextWithBg(ctx, `横振れ: ${p.offX}`, (rA+rB)/2, y_a + 90, "#dc2626");
-        ctx.restore();
-    }
-
-    function drawFront(ctx, w, h, sc, p, cox, coy) {
-        const cx = w/2 - (cox*sc)/2; 
-        const cy = h/2 - (coy*sc)/2;
-        const xA = cx - (p.w1/2)*sc, yA = cy - (p.h1/2)*sc;
-        const xB = cx + (cox - p.w2/2)*sc, yB = cy + (coy - p.h2/2)*sc;
-
-        ctx.lineWidth = 2.5; ctx.strokeStyle = "#2563eb"; ctx.strokeRect(xA, yA, p.w1*sc, p.h1*sc);
-        drawTextWithBg(ctx, `A面: ${p.w1}×${p.h1}`, xA + (p.w1*sc)/2, yA + (p.h1*sc)/2, "#2563eb");
-
-        ctx.setLineDash([6,4]); ctx.strokeStyle = "#ea580c"; ctx.strokeRect(xB, yB, p.w2*sc, p.h2*sc);
-        ctx.setLineDash([]); 
-        drawTextWithBg(ctx, `B面: ${p.w2}×${p.h2}`, xB + (p.w2*sc)/2, yB + (p.h2*sc)/2, "#ea580c");
-    }
-
-    function drawSide(ctx, w, h, sc, p, coy) {
-        const cx = w/2 - (p.L/2)*sc - 50; 
-        const cy = h/2 - (coy*sc)/2;
-        
-        const x_a = cx;
-        const x_b = cx + p.L*sc;
-        const y1_a_top = cy - (p.h1/2)*sc;
-        const y2_a_btm = cy + (p.h1/2)*sc;
-        const y3_b_top = cy + (coy - p.h2/2)*sc;
-        const y4_b_btm = cy + (coy + p.h2/2)*sc;
-
-        ctx.beginPath(); ctx.lineWidth = 1.5; ctx.strokeStyle = "#1e293b";
-        ctx.moveTo(x_a, y1_a_top);
-        ctx.lineTo(x_a, y2_a_btm);
-        ctx.lineTo(x_b, y4_b_btm);
-        ctx.lineTo(x_b, y3_b_top);
-        ctx.closePath(); 
-        ctx.fillStyle = "#f8fafc"; ctx.fill(); ctx.stroke();
-        
-        ctx.lineWidth = 4; 
-        ctx.strokeStyle = "#2563eb"; ctx.beginPath(); ctx.moveTo(x_a, y1_a_top); ctx.lineTo(x_a, y2_a_btm); ctx.stroke();
-        ctx.strokeStyle = "#ea580c"; ctx.beginPath(); ctx.moveTo(x_b, y3_b_top); ctx.lineTo(x_b, y4_b_btm); ctx.stroke();
-
-        drawDim(ctx, x_a, y1_a_top, x_a, y2_a_btm, `A面高: ${p.h1}`, -55, true);
-        drawDim(ctx, x_b, y3_b_top, x_b, y4_b_btm, `B面高: ${p.h2}`, 55, true);
-        
-        const baselineY = Math.max(y2_a_btm, y4_b_btm) + 70;
-        ctx.setLineDash([]); ctx.strokeStyle = "#475569"; ctx.lineWidth = 1;
-        ctx.beginPath(); ctx.moveTo(x_a, y2_a_btm); ctx.lineTo(x_a, baselineY + 10); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(x_b, y4_b_btm); ctx.lineTo(x_b, baselineY + 10); ctx.stroke();
-        drawSlashDimLine(ctx, x_a, baselineY, x_b, baselineY);
-        drawTextWithBg(ctx, `全長 L: ${p.L}`, (x_a + x_b) / 2, baselineY);
-
-        let rYA = state.baseY === 'top' ? y1_a_top : (state.baseY === 'bottom' ? y2_a_btm : (y1_a_top+y2_a_btm)/2);
-        let rYB = state.baseY === 'top' ? y3_b_top : (state.baseY === 'bottom' ? y4_b_btm : (y3_b_top+y4_b_btm)/2);
-
-        const labelX = x_b + 80;
-        ctx.save();
-        ctx.lineWidth = 1;
-        ctx.setLineDash([4, 4]); ctx.strokeStyle = "#94a3b8";
-        ctx.beginPath(); ctx.moveTo(x_a, rYA); ctx.lineTo(labelX, rYA); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(x_b, rYB); ctx.lineTo(labelX, rYB); ctx.stroke();
-        
-        ctx.setLineDash([]); ctx.strokeStyle = "#dc2626"; 
-        drawSlashDimLine(ctx, labelX - 5, rYA, labelX - 5, rYB);
-        drawTextWithBg(ctx, `縦振れ: ${p.offY}`, labelX, (rYA+rYB)/2, "#dc2626", "left");
-        ctx.restore();
+    function drawAll() {
+        render('topView', (ctx, w, h, sc) => drawTop(ctx, w, h, sc, getParams(), calculateOffsets(getParams()).cox, calculateOffsets(getParams()).coy), 'top');
+        render('frontView', (ctx, w, h, sc) => drawFront(ctx, w, h, sc, getParams(), calculateOffsets(getParams()).cox, calculateOffsets(getParams()).coy), 'front');
+        render('sideView', (ctx, w, h, sc) => drawSide(ctx, w, h, sc, getParams(), calculateOffsets(getParams()).coy), 'side');
     }
 
     async function exportOrderImage() {
         const btn = document.getElementById('saveBtn');
         const originalHtml = btn.innerHTML;
         btn.disabled = true;
-        btn.innerHTML = `<span class="loading-dots">作成中</span>`;
+        btn.innerHTML = `<span class="loading-dots">保存中</span>`;
 
         try {
-            // UI反映を待つ
-            await new Promise(r => setTimeout(r, 200));
+            await new Promise(r => setTimeout(r, 100));
             const p = getParams();
+            const { cox, coy } = calculateOffsets(p);
             const exportCanvas = document.getElementById('exportCanvas');
             const ectx = exportCanvas.getContext('2d');
             
+            // 書き出し用解像度を固定（1200x1650）
             exportCanvas.width = 1200;
             exportCanvas.height = 1650;
             ectx.fillStyle = "#ffffff";
             ectx.fillRect(0, 0, 1200, 1650);
             
-            // ヘッダーデザイン
-            const grad = ectx.createLinearGradient(0, 0, 1200, 0);
-            grad.addColorStop(0, "#0f172a");
-            grad.addColorStop(1, "#1e293b");
-            ectx.fillStyle = grad;
+            // ヘッダー
+            ectx.fillStyle = "#0f172a";
             ectx.fillRect(0, 0, 1200, 120);
             ectx.fillStyle = "#ffffff";
             ectx.font = "bold 42px sans-serif";
             ectx.fillText("製作仕様書 (角ダクト振れ管)", 50, 75);
-            
             ectx.font = "20px sans-serif";
             ectx.textAlign = "right";
-            ectx.fillText(`発行日時: ${new Date().toLocaleString('ja-JP')}`, 1150, 75);
+            ectx.fillText(`発行: ${new Date().toLocaleString('ja-JP')}`, 1150, 75);
             ectx.textAlign = "left";
 
-            // パラメータセクション
+            // 情報欄
             ectx.fillStyle = "#f8fafc";
-            ectx.fillRect(50, 150, 1100, 200);
+            ectx.fillRect(50, 150, 1100, 180);
             ectx.strokeStyle = "#cbd5e1";
-            ectx.lineWidth = 2;
-            ectx.strokeRect(50, 150, 1100, 200);
-
-            ectx.fillStyle = "#334155";
-            ectx.font = "bold 24px sans-serif";
-            ectx.fillText("■ 振れ管パラメータ", 80, 200);
-            
-            ectx.font = "bold 22px sans-serif";
+            ectx.strokeRect(50, 150, 1100, 180);
             ectx.fillStyle = "#1e293b";
-            ectx.fillText(`A面: ${p.w1} × ${p.h1}`, 80, 250);
-            ectx.fillText(`B面: ${p.w2} × ${p.h2}`, 400, 250);
-            ectx.fillText(`全長 L: ${p.L}`, 720, 250);
-            
+            ectx.font = "bold 22px sans-serif";
             const labels = {
                 baseY: { top: '天', center: '芯', bottom: '底' },
                 dirY: { up: '上げ', down: '下げ' },
                 baseX: { left: '左', center: '芯', right: '右' },
                 dirX: { left: '左へ', right: '右へ' }
             };
-            ectx.fillText(`横振れ(X): ${labels.baseX[state.baseX]}基準 / ${p.offX} / ${labels.dirX[state.dirX]}`, 80, 310);
-            ectx.fillText(`縦振れ(Y): ${labels.baseY[state.baseY]}基準 / ${p.offY} / ${labels.dirY[state.dirY]}`, 550, 310);
+            ectx.fillText(`A面: ${p.w1}×${p.h1}`, 80, 210);
+            ectx.fillText(`B面: ${p.w2}×${p.h2}`, 400, 210);
+            ectx.fillText(`全長 L: ${p.L}`, 720, 210);
+            ectx.fillText(`横振れ(X): ${labels.baseX[state.baseX]} / ${p.offX} / ${labels.dirX[state.dirX]}`, 80, 280);
+            ectx.fillText(`縦振れ(Y): ${labels.baseY[state.baseY]} / ${p.offY} / ${labels.dirY[state.dirY]}`, 550, 280);
 
-            // 各ビューを描画
-            const views = [
-                { id: 'topView', x: 50, y: 410, w: 535, h: 450, label: "平面図 (Top View)" },
-                { id: 'frontView', x: 615, y: 410, w: 535, h: 450, label: "正面図 (Front View)" },
-                { id: 'sideView', x: 50, y: 950, w: 1100, h: 630, label: "側面図 (Side View)" }
-            ];
-
-            views.forEach(v => {
-                const src = document.getElementById(v.id);
-                // 白背景を塗ってから転写
-                ectx.fillStyle = "#ffffff";
-                ectx.fillRect(v.x, v.y, v.w, v.h);
-                ectx.drawImage(src, v.x, v.y, v.w, v.h);
+            // 書き出し用スケーリング (固定幅に基づいて計算)
+            const drawOnExport = (id, x, y, w, h, type, drawFn) => {
+                ectx.save();
+                ectx.translate(x, y);
                 ectx.strokeStyle = "#e2e8f0";
-                ectx.lineWidth = 1;
-                ectx.strokeRect(v.x, v.y, v.w, v.h);
+                ectx.strokeRect(0, 0, w, h);
+                // 書き出し時専用のスケール計算
+                const boxW = Math.max(p.w1, p.w2, Math.abs(cox) + (p.w1+p.w2)/2, p.L);
+                const boxH = Math.max(p.h1, p.h2, Math.abs(coy) + (p.h1+p.h2)/2, p.L);
+                const margin = (type === 'side') ? 3.0 : 2.5;
+                const sc = Math.min(w, h) / (Math.max(boxW, boxH) * margin);
+                drawFn(ectx, w, h, sc, p, cox, coy);
+                ectx.restore();
                 ectx.fillStyle = "#64748b";
                 ectx.font = "bold 18px sans-serif";
-                ectx.fillText(v.label, v.x, v.y - 12);
-            });
+                ectx.fillText(id === 'top' ? "平面図" : (id === 'front' ? "正面図" : "側面図"), x, y - 10);
+            };
 
-            // 保存処理
+            drawOnExport('top', 50, 400, 535, 450, 'top', (ctx, w, h, sc) => drawTop(ctx, w, h, sc, p, cox, coy));
+            drawOnExport('front', 615, 400, 535, 450, 'front', (ctx, w, h, sc) => drawFront(ctx, w, h, sc, p, cox, coy));
+            drawOnExport('side', 50, 930, 1100, 650, 'side', (ctx, w, h, sc) => drawSide(ctx, w, h, sc, p, coy));
+
             const dataUrl = exportCanvas.toDataURL('image/png');
             const link = document.createElement('a');
             link.href = dataUrl;
             link.download = `duct_spec_${Date.now()}.png`;
-            document.body.appendChild(link);
             link.click();
-            document.body.removeChild(link);
-
         } catch (err) {
-            console.error("Export Error:", err);
-            alert("画像の保存に失敗しました。");
+            console.error(err);
         } finally {
             btn.disabled = false;
             btn.innerHTML = originalHtml;
         }
     }
 
-    // 初期化とリサイズ対応
-    window.onload = function() {
-        setTimeout(drawAll, 300);
-    };
-    
-    let resizeTimer;
-    window.onresize = () => {
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(drawAll, 200);
-    };
+    window.onload = () => setTimeout(drawAll, 300);
+    window.onresize = () => drawAll();
 </script>
 
 </body>
