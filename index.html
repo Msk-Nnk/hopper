@@ -78,12 +78,13 @@
 </head>
 <body class="text-slate-900 text-sm">
 
+<!-- コンテナ全体のスクロール制限を解除 -->
 <div class="flex flex-col lg:flex-row min-h-screen">
-    <!-- 設定パネル -->
-    <div class="lg:w-80 w-full bg-white border-b lg:border-r border-slate-300 p-5 shadow-sm z-20 overflow-y-auto lg:max-h-screen">
+    <!-- 設定パネル：独立スクロール設定（overflow-y-auto, max-h-screen）を解除 -->
+    <div class="lg:w-80 w-full bg-white border-b lg:border-r border-slate-300 p-5 shadow-sm z-20">
         <div class="flex items-center justify-between mb-6">
             <h2 class="text-xl font-black border-b-4 border-slate-800 pb-1">ダクト設定</h2>
-            <span class="bg-slate-100 text-slate-500 text-[10px] px-2 py-1 rounded">Ver 3.1</span>
+            <span class="bg-slate-100 text-slate-500 text-[10px] px-2 py-1 rounded">Ver 3.2</span>
         </div>
         
         <div class="space-y-5">
@@ -149,8 +150,8 @@
         </div>
     </div>
 
-    <!-- メイン表示エリア -->
-    <div class="flex-1 p-4 bg-slate-100 space-y-6 overflow-y-auto">
+    <!-- メイン表示エリア：独立スクロール設定（overflow-y-auto）を解除 -->
+    <div class="flex-1 p-4 bg-slate-100 space-y-6">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="flex flex-col">
                 <span class="text-xs font-black text-slate-700 uppercase tracking-widest mb-2">平面図 (Top View)</span>
@@ -185,7 +186,6 @@
     </div>
     <div class="flex gap-4 mt-6">
         <button onclick="closeModal()" class="bg-white/20 hover:bg-white/30 text-white px-8 py-3 rounded-full font-bold border border-white/50 backdrop-blur-sm transition-all">戻る</button>
-        <button onclick="window.print()" class="bg-white text-slate-900 px-8 py-3 rounded-full font-bold shadow-lg transition-all">印刷する</button>
     </div>
 </div>
 
@@ -414,7 +414,6 @@
             ectx.fillStyle = "#ffffff";
             ectx.fillRect(0, 0, 1200, 1650);
             
-            // ヘッダーデザイン（紺背景に白抜き文字）
             ectx.fillStyle = "#0f172a";
             ectx.fillRect(0, 0, 1200, 120);
             ectx.fillStyle = "#ffffff";
@@ -425,7 +424,6 @@
             ectx.fillText(`発行日: ${new Date().toLocaleDateString('ja-JP')} ${new Date().toLocaleTimeString('ja-JP')}`, 1150, 75);
             ectx.textAlign = "left";
 
-            // パラメータ表
             ectx.fillStyle = "#f8fafc";
             ectx.fillRect(50, 150, 1100, 180);
             ectx.strokeStyle = "#cbd5e1";
