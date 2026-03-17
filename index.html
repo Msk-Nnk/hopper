@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <!-- iPhone Safari用 (Webクリップアイコン) -->
+     <!-- iPhone Safari用 (Webクリップアイコン) -->
     <link rel="apple-touch-icon" href="apple-touch-icon.png" sizes="180x180">
     <!-- Android Chrome用 (ホーム画面ショートカット/PWAアイコン) -->
     <link rel="icon" href="android-chrome-192.png" sizes="192x192" type="image/png">
@@ -51,7 +51,6 @@
         .tab-btn.active { background: #0f172a; color: white; border-color: #0f172a; }
         .tab-group { display: flex; border-radius: 6px; overflow: hidden; margin-bottom: 6px; }
         
-        /* モーダルアニメーション */
         #previewModal {
             display: none;
             position: fixed;
@@ -79,34 +78,34 @@
 </head>
 <body class="text-slate-900 text-sm">
 
-<div class="flex flex-col lg:flex-row min-h-screen">
+<div class="max-w-7xl mx-auto flex flex-col lg:flex-row min-h-screen">
     <!-- 設定パネル -->
-    <div class="lg:w-80 w-full bg-white border-b lg:border-r border-slate-300 p-5 shadow-sm z-20 overflow-y-auto lg:max-h-screen">
+    <div class="lg:w-80 w-full bg-white border-b lg:border-r border-slate-300 p-5 shadow-sm">
         <div class="flex items-center justify-between mb-6">
             <h2 class="text-xl font-black border-b-4 border-slate-800 pb-1">ダクト設定</h2>
-            <span class="bg-slate-100 text-slate-500 text-[10px] px-2 py-1 rounded">Ver 3.0</span>
+            <span class="bg-slate-100 text-slate-500 text-[10px] px-2 py-1 rounded">Ver 3.3</span>
         </div>
         
         <div class="space-y-5">
             <section class="border-l-4 border-blue-500 pl-3">
                 <h3 class="text-xs font-bold text-blue-600 mb-2 uppercase tracking-tight">A面 (基準)</h3>
                 <div class="grid grid-cols-2 gap-3">
-                    <div><label class="text-[10px] text-slate-400 font-bold">A 幅</label><input type="number" id="w1" value="500" oninput="drawAll()"></div>
-                    <div><label class="text-[10px] text-slate-400 font-bold">A 高</label><input type="number" id="h1" value="500" oninput="drawAll()"></div>
+                    <div><label class="text-[10px] text-slate-400 font-bold">A 幅</label><input type="number" id="w1" value="500"></div>
+                    <div><label class="text-[10px] text-slate-400 font-bold">A 高</label><input type="number" id="h1" value="500"></div>
                 </div>
             </section>
 
             <section class="border-l-4 border-orange-500 pl-3">
                 <h3 class="text-xs font-bold text-orange-600 mb-2 uppercase tracking-tight">B面 (接続)</h3>
                 <div class="grid grid-cols-2 gap-3">
-                    <div><label class="text-[10px] text-slate-400 font-bold">B 幅</label><input type="number" id="w2" value="800" oninput="drawAll()"></div>
-                    <div><label class="text-[10px] text-slate-400 font-bold">B 高</label><input type="number" id="h2" value="300" oninput="drawAll()"></div>
+                    <div><label class="text-[10px] text-slate-400 font-bold">B 幅</label><input type="number" id="w2" value="800"></div>
+                    <div><label class="text-[10px] text-slate-400 font-bold">B 高</label><input type="number" id="h2" value="300"></div>
                 </div>
             </section>
 
             <section>
                 <h3 class="text-xs font-bold text-slate-600 mb-2">製品全長 (L)</h3>
-                <input type="number" id="L" value="600" oninput="drawAll()">
+                <input type="number" id="L" value="600">
             </section>
 
             <section class="bg-emerald-50 p-4 rounded-xl border border-emerald-100">
@@ -118,7 +117,7 @@
                     <button class="tab-btn flex-1 active" onclick="setParam('baseY','center')">芯</button>
                     <button class="tab-btn flex-1" onclick="setParam('baseY','bottom')">底</button>
                 </div>
-                <input type="number" id="offY" value="200" oninput="drawAll()" class="mb-3">
+                <input type="number" id="offY" value="200" class="mb-3">
                 <div class="tab-group" id="dirY">
                     <button class="tab-btn flex-1 active" onclick="setParam('dirY','down')">下げ</button>
                     <button class="tab-btn flex-1" onclick="setParam('dirY','up')">上げ</button>
@@ -134,7 +133,7 @@
                     <button class="tab-btn flex-1" onclick="setParam('baseX','center')">芯</button>
                     <button class="tab-btn flex-1" onclick="setParam('baseX','right')">右</button>
                 </div>
-                <input type="number" id="offX" value="300" oninput="drawAll()" class="mb-3">
+                <input type="number" id="offX" value="300" class="mb-3">
                 <div class="tab-group" id="dirX">
                     <button class="tab-btn flex-1" onclick="setParam('dirX','left')">左へ</button>
                     <button class="tab-btn flex-1 active" onclick="setParam('dirX','right')">右へ</button>
@@ -143,69 +142,52 @@
 
             <div class="pt-4 pb-8">
                 <button id="saveBtn" onclick="exportOrderImage()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-4 px-6 rounded-xl flex items-center justify-center transition-all shadow-xl active:scale-95">
-                    <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                    画像を生成して保存
+                    画像を生成・保存
                 </button>
             </div>
         </div>
     </div>
 
     <!-- メイン表示エリア -->
-    <div class="flex-1 p-4 bg-slate-100 space-y-6 overflow-y-auto">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="flex-1 p-6 bg-slate-100 space-y-10">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div class="flex flex-col">
-                <span class="text-xs font-black text-slate-700 uppercase tracking-widest mb-2">平面図</span>
-                <div class="aspect-square">
+                <span class="text-xs font-black text-slate-500 mb-3 flex items-center">平面図 (TOP VIEW)</span>
+                <div class="aspect-square bg-white rounded-lg overflow-hidden border">
                     <canvas id="topView"></canvas>
                 </div>
             </div>
             <div class="flex flex-col">
-                <span class="text-xs font-black text-slate-700 uppercase tracking-widest mb-2">正面図</span>
-                <div class="aspect-square">
+                <span class="text-xs font-black text-slate-500 mb-3 flex items-center">正面図 (FRONT VIEW)</span>
+                <div class="aspect-square bg-white rounded-lg overflow-hidden border">
                     <canvas id="frontView"></canvas>
                 </div>
             </div>
         </div>
-        <div class="flex flex-col pb-10">
-            <span class="text-xs font-black text-slate-700 uppercase tracking-widest mb-2">側面図</span>
-            <div class="h-[300px] md:h-[400px]">
+        <div class="flex flex-col pb-20">
+            <span class="text-xs font-black text-slate-500 mb-3 flex items-center">側面図 (SIDE VIEW)</span>
+            <div class="h-[450px] bg-white rounded-lg overflow-hidden border">
                 <canvas id="sideView"></canvas>
             </div>
         </div>
     </div>
 </div>
 
-<!-- スマホ保存用プレビューモーダル -->
 <div id="previewModal">
-    <div class="text-white text-center mb-4">
+    <div class="text-white text-center mb-4 px-4">
         <p class="font-bold text-lg">画像が生成されました</p>
-        <p class="text-sm opacity-80">カメラロールに保存するには、<br><span class="text-yellow-400 font-bold underline">画像を長押し</span>して「写真を保存」を選んでください</p>
+        <p class="text-sm opacity-80">画像を長押しして保存してください</p>
     </div>
-    <div class="relative max-w-full max-h-[70vh] overflow-auto bg-white rounded-lg shadow-2xl">
-        <img id="previewImage" class="max-w-full h-auto select-none" alt="生成された画像">
+    <div class="relative max-w-full max-h-[70vh] overflow-auto bg-white rounded-lg mx-4">
+        <img id="previewImage" class="max-w-full h-auto" alt="生成画像">
     </div>
-    <button onclick="closeModal()" class="mt-8 bg-white/20 hover:bg-white/30 text-white px-8 py-3 rounded-full font-bold border border-white/50 backdrop-blur-sm">閉じる</button>
+    <button onclick="closeModal()" class="mt-8 bg-white/20 text-white px-10 py-3 rounded-full font-bold border border-white/50">閉じる</button>
 </div>
 
 <canvas id="exportCanvas" style="display:none;"></canvas>
 
 <script>
     let state = { baseX: 'left', baseY: 'center', dirX: 'right', dirY: 'down' };
-
-    function setParam(key, val) {
-        state[key] = val;
-        const parent = document.getElementById(key);
-        parent.querySelectorAll('.tab-btn').forEach(b => {
-            const labels = {
-                baseY: { top: '天', center: '芯', bottom: '底' },
-                dirY: { up: '上げ', down: '下げ' },
-                baseX: { left: '左', center: '芯', right: '右' },
-                dirX: { left: '左へ', right: '右へ' }
-            };
-            b.classList.toggle('active', b.textContent === labels[key][val]);
-        });
-        drawAll();
-    }
 
     function getParams() {
         return {
@@ -260,9 +242,7 @@
         const bgW = metrics.width + padding * 4;
         const bgH = 16;
         ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
-        let startX = x;
-        if (align === "center") startX = x - bgW / 2;
-        else if (align === "right") startX = x - bgW;
+        let startX = (align === "center") ? x - bgW / 2 : ((align === "right") ? x - bgW : x);
         ctx.fillRect(startX, y - bgH/2 - 2, bgW, bgH);
         ctx.fillStyle = color;
         ctx.textAlign = align;
@@ -272,8 +252,7 @@
 
     function drawDim(ctx, x1, y1, x2, y2, text, offset = 20, isVertical = false) {
         ctx.save();
-        ctx.setLineDash([]);
-        ctx.strokeStyle = "#64748b";
+        ctx.strokeStyle = "#94a3b8";
         ctx.lineWidth = 1;
         if (!isVertical) {
             ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x1, y1 + offset); ctx.stroke();
@@ -290,28 +269,18 @@
     }
 
     function drawTop(ctx, w, h, sc, p, cox, coy) {
-        const cx = w/2 + (cox*sc)/2;
-        const cy = h/2;
+        const cx = w/2 + (cox*sc)/2, cy = h/2;
         const y_b = cy - (p.L/2)*sc, y_a = cy + (p.L/2)*sc;
         const x1_a = cx - cox*sc - (p.w1/2)*sc, x2_a = cx - cox*sc + (p.w1/2)*sc;
         const x3_b = cx - (p.w2/2)*sc, x4_b = cx + (p.w2/2)*sc;
         ctx.beginPath(); ctx.lineWidth = 1.5; ctx.strokeStyle = "#1e293b";
         ctx.moveTo(x1_a, y_a); ctx.lineTo(x2_a, y_a); ctx.lineTo(x4_b, y_b); ctx.lineTo(x3_b, y_b); ctx.closePath(); 
-        ctx.fillStyle = "#f8fafc"; ctx.fill(); ctx.stroke();
+        ctx.fillStyle = "#ffffff"; ctx.fill(); ctx.stroke();
         ctx.lineWidth = 4; ctx.strokeStyle = "#2563eb"; ctx.beginPath(); ctx.moveTo(x1_a, y_a); ctx.lineTo(x2_a, y_a); ctx.stroke();
         ctx.strokeStyle = "#ea580c"; ctx.beginPath(); ctx.moveTo(x3_b, y_b); ctx.lineTo(x4_b, y_b); ctx.stroke();
         drawDim(ctx, x1_a, y_a, x2_a, y_a, `A幅:${p.w1}`, 45);
         drawDim(ctx, x3_b, y_b, x4_b, y_b, `B幅:${p.w2}`, -45);
         drawDim(ctx, x2_a, y_a, x2_a, y_b, `L:${p.L}`, 65, true);
-        let rA = state.baseX === 'left' ? x1_a : (state.baseX === 'right' ? x2_a : (x1_a+x2_a)/2);
-        let rB = state.baseX === 'left' ? x3_b : (state.baseX === 'right' ? x4_b : (x3_b+x4_b)/2);
-        ctx.save(); ctx.lineWidth = 1; ctx.setLineDash([4, 4]); ctx.strokeStyle = "#94a3b8";
-        ctx.beginPath(); ctx.moveTo(rA, y_a); ctx.lineTo(rA, y_a + 95); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(rB, y_b); ctx.lineTo(rB, y_a + 95); ctx.stroke();
-        ctx.setLineDash([]); ctx.strokeStyle = "#dc2626"; 
-        drawSlashDimLine(ctx, rA, y_a + 90, rB, y_a + 90);
-        drawTextWithBg(ctx, `横振れ:${p.offX}`, (rA+rB)/2, y_a + 90, "#dc2626");
-        ctx.restore();
     }
 
     function drawFront(ctx, w, h, sc, p, cox, coy) {
@@ -325,59 +294,82 @@
     }
 
     function drawSide(ctx, w, h, sc, p, coy) {
-        const cx = w/2 - (p.L/2)*sc - 50, cy = h/2 - (coy*sc)/2;
+        const cx = w/2 - (p.L/2)*sc - 30, cy = h/2 - (coy*sc)/2;
         const x_a = cx, x_b = cx + p.L*sc;
         const y1_a_top = cy - (p.h1/2)*sc, y2_a_btm = cy + (p.h1/2)*sc;
         const y3_b_top = cy + (coy - p.h2/2)*sc, y4_b_btm = cy + (coy + p.h2/2)*sc;
-        ctx.beginPath(); ctx.lineWidth = 1.5; ctx.strokeStyle = "#1e293b";
-        ctx.moveTo(x_a, y1_a_top); ctx.lineTo(x_a, y2_a_btm); ctx.lineTo(x_b, y4_b_btm); ctx.lineTo(x_b, y3_b_top); ctx.closePath(); 
-        ctx.fillStyle = "#f8fafc"; ctx.fill(); ctx.stroke();
-        ctx.lineWidth = 4; ctx.strokeStyle = "#2563eb"; ctx.beginPath(); ctx.moveTo(x_a, y1_a_top); ctx.lineTo(x_a, y2_a_btm); ctx.stroke();
-        ctx.strokeStyle = "#ea580c"; ctx.beginPath(); ctx.moveTo(x_b, y3_b_top); ctx.lineTo(x_b, y4_b_btm); ctx.stroke();
+        
+        ctx.beginPath(); 
+        ctx.lineWidth = 1.5; 
+        ctx.strokeStyle = "#1e293b";
+        ctx.moveTo(x_a, y1_a_top); 
+        ctx.lineTo(x_a, y2_a_btm); 
+        ctx.lineTo(x_b, y4_b_btm); 
+        ctx.lineTo(x_b, y3_b_top); 
+        ctx.closePath(); 
+        ctx.fillStyle = "#ffffff"; 
+        ctx.fill(); 
+        ctx.stroke();
+
+        ctx.lineWidth = 4; 
+        ctx.strokeStyle = "#2563eb"; 
+        ctx.beginPath(); 
+        ctx.moveTo(x_a, y1_a_top); 
+        ctx.lineTo(x_a, y2_a_btm); 
+        ctx.stroke();
+
+        ctx.strokeStyle = "#ea580c"; 
+        ctx.beginPath(); 
+        ctx.moveTo(x_b, y3_b_top); 
+        ctx.lineTo(x_b, y4_b_btm); 
+        ctx.stroke();
+
         drawDim(ctx, x_a, y1_a_top, x_a, y2_a_btm, `A高:${p.h1}`, -55, true);
         drawDim(ctx, x_b, y3_b_top, x_b, y4_b_btm, `B高:${p.h2}`, 55, true);
-        const baselineY = Math.max(y2_a_btm, y4_b_btm) + 70;
-        ctx.setLineDash([]); ctx.strokeStyle = "#475569"; ctx.lineWidth = 1;
-        ctx.beginPath(); ctx.moveTo(x_a, y2_a_btm); ctx.lineTo(x_a, baselineY + 10); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(x_b, y4_b_btm); ctx.lineTo(x_b, baselineY + 10); ctx.stroke();
-        drawSlashDimLine(ctx, x_a, baselineY, x_b, baselineY);
-        drawTextWithBg(ctx, `L:${p.L}`, (x_a + x_b) / 2, baselineY);
-        let rYA = state.baseY === 'top' ? y1_a_top : (state.baseY === 'bottom' ? y2_a_btm : (y1_a_top+y2_a_btm)/2);
-        let rYB = state.baseY === 'top' ? y3_b_top : (state.baseY === 'bottom' ? y4_b_btm : (y3_b_top+y4_b_btm)/2);
-        const labelX = x_b + 80;
-        ctx.save(); ctx.lineWidth = 1; ctx.setLineDash([4, 4]); ctx.strokeStyle = "#94a3b8";
-        ctx.beginPath(); ctx.moveTo(x_a, rYA); ctx.lineTo(labelX, rYA); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(x_b, rYB); ctx.lineTo(labelX, rYB); ctx.stroke();
-        ctx.setLineDash([]); ctx.strokeStyle = "#dc2626"; drawSlashDimLine(ctx, labelX - 5, rYA, labelX - 5, rYB);
-        drawTextWithBg(ctx, `縦振れ:${p.offY}`, labelX, (rYA+rYB)/2, "#dc2626", "left");
-        ctx.restore();
-    }
-
-    function render(id, drawFn, type) {
-        const canvas = document.getElementById(id);
-        const ctx = canvas.getContext('2d');
-        const dpr = window.devicePixelRatio || 1;
-        const rect = canvas.parentElement.getBoundingClientRect();
-        canvas.style.width = rect.width + "px";
-        canvas.style.height = rect.height + "px";
-        canvas.width = rect.width * dpr;
-        canvas.height = rect.height * dpr;
-        ctx.resetTransform();
-        ctx.scale(dpr, dpr);
-        ctx.clearRect(0, 0, rect.width, rect.height);
-        const p = getParams();
-        const { cox, coy } = calculateOffsets(p);
-        const boxW = Math.max(p.w1, p.w2, Math.abs(cox) + (p.w1+p.w2)/2, p.L);
-        const boxH = Math.max(p.h1, p.h2, Math.abs(coy) + (p.h1+p.h2)/2, p.L);
-        const margin = (type === 'side') ? 3.0 : 2.5;
-        const sc = Math.min(rect.width, rect.height) / (Math.max(boxW, boxH) * margin);
-        drawFn(ctx, rect.width, rect.height, sc);
+        drawDim(ctx, x_a, y2_a_btm, x_b, y2_a_btm, `L:${p.L}`, 80);
     }
 
     function drawAll() {
-        render('topView', (ctx, w, h, sc) => drawTop(ctx, w, h, sc, getParams(), calculateOffsets(getParams()).cox, calculateOffsets(getParams()).coy), 'top');
-        render('frontView', (ctx, w, h, sc) => drawFront(ctx, w, h, sc, getParams(), calculateOffsets(getParams()).cox, calculateOffsets(getParams()).coy), 'front');
-        render('sideView', (ctx, w, h, sc) => drawSide(ctx, w, h, sc, getParams(), calculateOffsets(getParams()).coy), 'side');
+        const canvases = ['topView', 'frontView', 'sideView'];
+        const p = getParams();
+        const { cox, coy } = calculateOffsets(p);
+        
+        canvases.forEach(id => {
+            const canvas = document.getElementById(id);
+            if(!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const dpr = window.devicePixelRatio || 1;
+            const rect = canvas.parentElement.getBoundingClientRect();
+            
+            // サイズリセットとスケーリング
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.scale(dpr, dpr);
+            ctx.clearRect(0,0, rect.width, rect.height);
+
+            const boxW = Math.max(p.w1, p.w2, Math.abs(cox) + (p.w1+p.w2)/2, p.L);
+            const boxH = Math.max(p.h1, p.h2, Math.abs(coy) + (p.h1+p.h2)/2, p.L);
+            const sc = Math.min(rect.width, rect.height) / (Math.max(boxW, boxH) * 2.8);
+
+            if(id === 'topView') drawTop(ctx, rect.width, rect.height, sc, p, cox, coy);
+            if(id === 'frontView') drawFront(ctx, rect.width, rect.height, sc, p, cox, coy);
+            if(id === 'sideView') drawSide(ctx, rect.width, rect.height, sc, p, coy);
+        });
+    }
+
+    function setParam(key, val) {
+        state[key] = val;
+        const parent = document.getElementById(key);
+        const labels = {
+            baseY: { top: '天', center: '芯', bottom: '底' },
+            dirY: { up: '上げ', down: '下げ' },
+            baseX: { left: '左', center: '芯', right: '右' },
+            dirX: { left: '左へ', right: '右へ' }
+        };
+        parent.querySelectorAll('.tab-btn').forEach(b => {
+            b.classList.toggle('active', b.textContent === labels[key][val]);
+        });
+        drawAll();
     }
 
     function closeModal() {
@@ -386,91 +378,62 @@
 
     async function exportOrderImage() {
         const btn = document.getElementById('saveBtn');
-        const originalHtml = btn.innerHTML;
         btn.disabled = true;
-        btn.innerHTML = `<span class="loading-dots">画像を生成中</span>`;
+        btn.innerHTML = `<span class="loading-dots">生成中</span>`;
 
         try {
-            await new Promise(r => setTimeout(r, 100));
+            await new Promise(r => setTimeout(r, 200));
             const p = getParams();
             const { cox, coy } = calculateOffsets(p);
             const exportCanvas = document.getElementById('exportCanvas');
             const ectx = exportCanvas.getContext('2d');
             
-            exportCanvas.width = 1200;
-            exportCanvas.height = 1650;
+            exportCanvas.width = 1000;
+            exportCanvas.height = 1400;
             ectx.fillStyle = "#ffffff";
-            ectx.fillRect(0, 0, 1200, 1650);
+            ectx.fillRect(0, 0, 1000, 1400);
             
             ectx.fillStyle = "#0f172a";
-            ectx.fillRect(0, 0, 1200, 120);
+            ectx.fillRect(0,0,1000,100);
             ectx.fillStyle = "#ffffff";
-            ectx.font = "bold 42px sans-serif";
-            ectx.fillText("製作仕様書 (角ダクト振れ管)", 50, 75);
-            ectx.font = "20px sans-serif";
-            ectx.textAlign = "right";
-            ectx.fillText(`発行: ${new Date().toLocaleString('ja-JP')}`, 1150, 75);
-            ectx.textAlign = "left";
+            ectx.font = "bold 30px sans-serif";
+            ectx.fillText("製作仕様書: 角ダクト振れ管", 40, 60);
 
-            ectx.fillStyle = "#f8fafc";
-            ectx.fillRect(50, 150, 1100, 180);
-            ectx.strokeStyle = "#cbd5e1";
-            ectx.strokeRect(50, 150, 1100, 180);
             ectx.fillStyle = "#1e293b";
-            ectx.font = "bold 22px sans-serif";
-            const labels = {
-                baseY: { top: '天', center: '芯', bottom: '底' },
-                dirY: { up: '上げ', down: '下げ' },
-                baseX: { left: '左', center: '芯', right: '右' },
-                dirX: { left: '左へ', right: '右へ' }
-            };
-            ectx.fillText(`A面: ${p.w1}×${p.h1}`, 80, 210);
-            ectx.fillText(`B面: ${p.w2}×${p.h2}`, 400, 210);
-            ectx.fillText(`全長 L: ${p.L}`, 720, 210);
-            ectx.fillText(`横振れ(X): ${labels.baseX[state.baseX]} / ${p.offX} / ${labels.dirX[state.dirX]}`, 80, 280);
-            ectx.fillText(`縦振れ(Y): ${labels.baseY[state.baseY]} / ${p.offY} / ${labels.dirY[state.dirY]}`, 550, 280);
+            ectx.font = "bold 18px sans-serif";
+            ectx.fillText(`A面:${p.w1}×${p.h1}  B面:${p.w2}×${p.h2}  L:${p.L}`, 40, 150);
 
-            const drawOnExport = (id, x, y, w, h, type, drawFn) => {
-                ectx.save();
-                ectx.translate(x, y);
-                ectx.strokeStyle = "#e2e8f0";
-                ectx.strokeRect(0, 0, w, h);
-                const boxW = Math.max(p.w1, p.w2, Math.abs(cox) + (p.w1+p.w2)/2, p.L);
-                const boxH = Math.max(p.h1, p.h2, Math.abs(coy) + (p.h1+p.h2)/2, p.L);
-                const margin = (type === 'side') ? 3.0 : 2.5;
-                const sc = Math.min(w, h) / (Math.max(boxW, boxH) * margin);
-                drawFn(ectx, w, h, sc, p, cox, coy);
-                ectx.restore();
-                ectx.fillStyle = "#64748b";
-                ectx.font = "bold 18px sans-serif";
-                ectx.fillText(id === 'top' ? "平面図" : (id === 'front' ? "正面図" : "側面図"), x, y - 10);
+            // 簡易描画をエクスポート
+            const drawEx = (x,y,w,h,fn) => {
+                ectx.save(); ectx.translate(x,y); 
+                ectx.strokeStyle="#ccc"; ectx.strokeRect(0,0,w,h);
+                const sc = Math.min(w,h) / (Math.max(p.w1,p.w2,p.h1,p.h2,p.L,p.offX,p.offY)*3);
+                fn(ectx,w,h,sc); ectx.restore();
             };
 
-            drawOnExport('top', 50, 400, 535, 450, 'top', (ctx, w, h, sc) => drawTop(ctx, w, h, sc, p, cox, coy));
-            drawOnExport('front', 615, 400, 535, 450, 'front', (ctx, w, h, sc) => drawFront(ctx, w, h, sc, p, cox, coy));
-            drawOnExport('side', 50, 930, 1100, 650, 'side', (ctx, w, h, sc) => drawSide(ctx, w, h, sc, p, coy));
+            drawEx(50,200,430,400,(ctx,w,h,sc)=>drawTop(ctx,w,h,sc,p,cox,coy));
+            drawEx(520,200,430,400,(ctx,w,h,sc)=>drawFront(ctx,w,h,sc,p,cox,coy));
+            drawEx(50,650,900,600,(ctx,w,h,sc)=>drawSide(ctx,w,h,sc,p,coy));
 
-            // 画像を表示
-            const dataUrl = exportCanvas.toDataURL('image/png');
-            document.getElementById('previewImage').src = dataUrl;
+            document.getElementById('previewImage').src = exportCanvas.toDataURL('image/png');
             document.getElementById('previewModal').classList.add('active');
-
-            // 自動ダウンロードも並行して実行
-            const link = document.createElement('a');
-            link.href = dataUrl;
-            link.download = `duct_spec_${Date.now()}.png`;
-            link.click();
-            
-        } catch (err) {
-            console.error(err);
+        } catch(e) {
+            console.error(e);
         } finally {
             btn.disabled = false;
-            btn.innerHTML = originalHtml;
+            btn.innerHTML = "画像を生成・保存";
         }
     }
 
-    window.onload = () => setTimeout(drawAll, 300);
-    window.onresize = () => drawAll();
+    // 全てのinputにイベントを付与
+    document.querySelectorAll('input').forEach(input => {
+        input.addEventListener('input', drawAll);
+    });
+
+    window.addEventListener('load', () => {
+        setTimeout(drawAll, 100);
+    });
+    window.addEventListener('resize', drawAll);
 </script>
 
 </body>
