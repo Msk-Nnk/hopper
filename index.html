@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <!-- iPhone Safari用 (Webクリップアイコン) -->
+     <!-- iPhone Safari用 (Webクリップアイコン) -->
     <link rel="apple-touch-icon" href="apple-touch-icon.png" sizes="180x180">
     <!-- Android Chrome用 (ホーム画面ショートカット/PWAアイコン) -->
     <link rel="icon" href="android-chrome-192.png" sizes="192x192" type="image/png">
@@ -33,6 +33,11 @@
             width: 100%; 
             font-size: 16px; 
             font-weight: bold; 
+            outline: none;
+        }
+        input[type="number"]:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
         }
         .tab-btn { 
             padding: 12px 2px; 
@@ -66,7 +71,7 @@
     <div class="lg:w-80 w-full bg-white border-b lg:border-r border-slate-300 p-5 shadow-sm z-20 overflow-y-auto lg:max-h-screen">
         <div class="flex items-center justify-between mb-6">
             <h2 class="text-xl font-black border-b-4 border-slate-800 pb-1">ダクト設定</h2>
-            <span class="bg-slate-100 text-slate-500 text-[10px] px-2 py-1 rounded">Ver 2.3</span>
+            <span class="bg-slate-100 text-slate-500 text-[10px] px-2 py-1 rounded">Ver 2.4</span>
         </div>
         
         <div class="space-y-5">
@@ -126,7 +131,7 @@
             <div class="pt-4 pb-8">
                 <button id="saveBtn" onclick="exportOrderImage()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-4 px-6 rounded-xl flex items-center justify-center transition-all shadow-xl active:scale-95">
                     <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                    画像を保存
+                    製作仕様書を保存
                 </button>
             </div>
         </div>
@@ -163,6 +168,7 @@
     </div>
 </div>
 
+<!-- 非表示の書き出し用キャンバス -->
 <canvas id="exportCanvas" style="display:none;"></canvas>
 
 <script>
@@ -404,10 +410,11 @@
         const btn = document.getElementById('saveBtn');
         const originalHtml = btn.innerHTML;
         btn.disabled = true;
-        btn.innerHTML = `<span class="loading-dots">保存中</span>`;
+        btn.innerHTML = `<span class="loading-dots">作成中</span>`;
 
         try {
-            await new Promise(r => setTimeout(r, 100));
+            // UI反映を待つ
+            await new Promise(r => setTimeout(r, 200));
             const p = getParams();
             const exportCanvas = document.getElementById('exportCanvas');
             const ectx = exportCanvas.getContext('2d');
@@ -417,7 +424,11 @@
             ectx.fillStyle = "#ffffff";
             ectx.fillRect(0, 0, 1200, 1650);
             
-            ectx.fillStyle = "#0f172a";
+            // ヘッダーデザイン
+            const grad = ectx.createLinearGradient(0, 0, 1200, 0);
+            grad.addColorStop(0, "#0f172a");
+            grad.addColorStop(1, "#1e293b");
+            ectx.fillStyle = grad;
             ectx.fillRect(0, 0, 1200, 120);
             ectx.fillStyle = "#ffffff";
             ectx.font = "bold 42px sans-serif";
@@ -428,9 +439,11 @@
             ectx.fillText(`発行日時: ${new Date().toLocaleString('ja-JP')}`, 1150, 75);
             ectx.textAlign = "left";
 
+            // パラメータセクション
             ectx.fillStyle = "#f8fafc";
             ectx.fillRect(50, 150, 1100, 200);
             ectx.strokeStyle = "#cbd5e1";
+            ectx.lineWidth = 2;
             ectx.strokeRect(50, 150, 1100, 200);
 
             ectx.fillStyle = "#334155";
@@ -449,17 +462,21 @@
                 baseX: { left: '左', center: '芯', right: '右' },
                 dirX: { left: '左へ', right: '右へ' }
             };
-            ectx.fillText(`横振れ(X): ${labels.baseX[state.baseX]}基準 / ${p.offX} / ${labels.dirX[state.dirX]}`, 80, 300);
-            ectx.fillText(`縦振れ(Y): ${labels.baseY[state.baseY]}基準 / ${p.offY} / ${labels.dirY[state.dirY]}`, 550, 300);
+            ectx.fillText(`横振れ(X): ${labels.baseX[state.baseX]}基準 / ${p.offX} / ${labels.dirX[state.dirX]}`, 80, 310);
+            ectx.fillText(`縦振れ(Y): ${labels.baseY[state.baseY]}基準 / ${p.offY} / ${labels.dirY[state.dirY]}`, 550, 310);
 
+            // 各ビューを描画
             const views = [
-                { id: 'topView', x: 50, y: 400, w: 535, h: 450, label: "平面図 (Top View)" },
-                { id: 'frontView', x: 615, y: 400, w: 535, h: 450, label: "正面図 (Front View)" },
-                { id: 'sideView', x: 50, y: 920, w: 1100, h: 650, label: "側面図 (Side View)" }
+                { id: 'topView', x: 50, y: 410, w: 535, h: 450, label: "平面図 (Top View)" },
+                { id: 'frontView', x: 615, y: 410, w: 535, h: 450, label: "正面図 (Front View)" },
+                { id: 'sideView', x: 50, y: 950, w: 1100, h: 630, label: "側面図 (Side View)" }
             ];
 
             views.forEach(v => {
                 const src = document.getElementById(v.id);
+                // 白背景を塗ってから転写
+                ectx.fillStyle = "#ffffff";
+                ectx.fillRect(v.x, v.y, v.w, v.h);
                 ectx.drawImage(src, v.x, v.y, v.w, v.h);
                 ectx.strokeStyle = "#e2e8f0";
                 ectx.lineWidth = 1;
@@ -469,6 +486,7 @@
                 ectx.fillText(v.label, v.x, v.y - 12);
             });
 
+            // 保存処理
             const dataUrl = exportCanvas.toDataURL('image/png');
             const link = document.createElement('a');
             link.href = dataUrl;
@@ -486,8 +504,9 @@
         }
     }
 
+    // 初期化とリサイズ対応
     window.onload = function() {
-        setTimeout(drawAll, 200);
+        setTimeout(drawAll, 300);
     };
     
     let resizeTimer;
