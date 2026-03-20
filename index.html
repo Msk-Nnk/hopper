@@ -218,19 +218,21 @@
 <canvas id="exportCanvas" style="display:none;"></canvas>
 
 <script>
+    // 表示用ラベルの共通定義
+    const UI_LABELS = {
+            baseY: { top: '天', center: '芯', bottom: '底' },
+            dirY: { up: '上げ', down: '下げ' },
+            baseX: { left: '左', center: '芯', right: '右' },
+            dirX: { left: '左へ', right: '右へ' }
+    };
+
     let state = { baseX: 'left', baseY: 'center', dirX: 'right', dirY: 'down' };
 
     function setParam(key, val) {
         state[key] = val;
         const parent = document.getElementById(key);
         parent.querySelectorAll('.tab-btn').forEach(b => {
-            const labels = {
-                baseY: { top: '天', center: '芯', bottom: '底' },
-                dirY: { up: '上げ', down: '下げ' },
-                baseX: { left: '左', center: '芯', right: '右' },
-                dirX: { left: '左へ', right: '右へ' }
-            };
-            b.classList.toggle('active', b.textContent === labels[key][val]);
+            b.classList.toggle('active', b.textContent === UI_LABELS[key][val]);
         });
         drawAll();
     }
@@ -356,8 +358,7 @@
         drawTextWithBg(ctx, `A: ${p.w1}×${p.h1} (${p.t1})`, xA + (p.w1 * sc) / 2, yA + (p.h1 * sc) / 2, "#2563eb");
 
         ctx.setLineDash([6,4]); ctx.strokeStyle = "#ea580c"; ctx.strokeRect(xB, yB, p.w2*sc, p.h2*sc);
-        ctx.setLineDash([]); drawTextWithBg(ctx, `B: ${p.w2}×${p.h2}`, xB + (p.w2*sc)/2, yB + (p.h2*sc)/2, "#ea580c");
-        drawTextWithBg(ctx, `B: ${p.w2}×${p.h2} (${p.t2})`, xB + (p.w2 * sc) / 2, yB + (p.h2 * sc) / 2, "#ea580c");
+        ctx.setLineDash([]); drawTextWithBg(ctx, `B: ${p.w2}×${p.h2} (${p.t2})`, xB + (p.w2 * sc) / 2, yB + (p.h2 * sc) / 2, "#ea580c");
     }
 
     function drawSide(ctx, w, h, sc, p, coy) {
@@ -459,18 +460,17 @@
             ectx.strokeRect(50, 150, 1100, 180);
             ectx.fillStyle = "#1e293b";
             ectx.font = "bold 24px sans-serif";
-            const labels = {
-                baseY: { top: '天', center: '芯', bottom: '底' },
-                dirY: { up: '上げ', down: '下げ' },
-                baseX: { left: '左', center: '芯', right: '右' },
-                dirX: { left: '左へ', right: '右へ' }
-            };
+            // 1行目: A面・B面
             ectx.fillText(`A面: W${p.w1}×H${p.h1} [${p.t1}]`, 80, 200);
             ectx.fillText(`B面: W${p.w2}×H${p.h2} [${p.t2}]`, 550, 200);
+
+            // 2行目: 全長
             ectx.fillText(`全長 L: ${p.L}`, 80, 265);
+
+            // 3行目: 振れ情報 (UI_LABELSを参照)
             ectx.font = "22px sans-serif";
-            ectx.fillText(`横振れ(X): ${labels.baseX[state.baseX]}基準 / ${p.offX} / ${labels.dirX[state.dirX]}`, 80, 315);
-            ectx.fillText(`縦振れ(Y): ${labels.baseY[state.baseY]}基準 / ${p.offY} / ${labels.dirY[state.dirY]}`, 550, 315);
+            ectx.fillText(`横振れ(X): ${UI_LABELS.baseX[state.baseX]}基準 / ${p.offX} / ${UI_LABELS.dirX[state.dirX]}`, 80, 315);
+            ectx.fillText(`縦振れ(Y): ${UI_LABELS.baseY[state.baseY]}基準 / ${p.offY} / ${UI_LABELS.dirY[state.dirY]}`, 550, 315);
 
             const drawOnExport = (id, x, y, w, h, type, drawFn) => {
                 ectx.save();
