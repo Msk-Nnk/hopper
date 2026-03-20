@@ -13,44 +13,44 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&display=swap');
-        body { 
-            font-family: 'Noto Sans JP', sans-serif; 
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
             background-color: #f1f5f9;
             -webkit-tap-highlight-color: transparent;
         }
-        canvas { 
-            background-color: #ffffff; 
-            border: 1px solid #cbd5e1; 
-            border-radius: 8px; 
-            width: 100%; 
+        canvas {
+            background-color: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            width: 100%;
             height: 100%;
-            touch-action: pan-y; 
+            touch-action: pan-y;
         }
-        input[type="number"] { 
-            border: 1px solid #cbd5e1; 
-            border-radius: 6px; 
-            padding: 10px; 
-            width: 100%; 
-            font-size: 16px; 
-            font-weight: bold; 
+        input[type="number"] {
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 10px;
+            width: 100%;
+            font-size: 16px;
+            font-weight: bold;
             outline: none;
         }
         input[type="number"]:focus {
             border-color: #3b82f6;
             box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
         }
-        .tab-btn { 
-            padding: 12px 2px; 
-            font-size: 14px; 
-            font-weight: bold; 
-            cursor: pointer; 
-            border: 1px solid #cbd5e1; 
-            background: white; 
+        .tab-btn {
+            padding: 12px 2px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            border: 1px solid #cbd5e1;
+            background: white;
             transition: all 0.2s;
         }
         .tab-btn.active { background: #0f172a; color: white; border-color: #0f172a; }
         .tab-group { display: flex; border-radius: 6px; overflow: hidden; margin-bottom: 6px; }
-        
+
         #previewModal {
             display: none;
             position: fixed;
@@ -86,19 +86,45 @@
             <h2 class="text-xl font-black border-b-4 border-slate-800 pb-1">ダクト設定</h2>
             <span class="bg-slate-100 text-slate-500 text-[10px] px-2 py-1 rounded">Ver 3.2</span>
         </div>
-        
+
         <div class="space-y-5">
             <section class="border-l-4 border-blue-500 pl-3">
                 <h3 class="text-xs font-bold text-blue-600 mb-2 uppercase tracking-tight">A面 (基準)</h3>
                 <div class="grid grid-cols-2 gap-3">
-                    <div><label class="text-[10px] text-slate-400 font-bold">A 幅(W)</label><input type="number" id="w1" value="500" oninput="drawAll()"></div>
-                    <div><label class="text-[10px] text-slate-400 font-bold">A 高(H)</label><input type="number" id="h1" value="500" oninput="drawAll()"></div>
+                    <div class="col-span-2">
+                         <label class="text-[10px] text-slate-400 font-bold">A 工法</label>
+                         <select id="t1" onchange="drawAll()"
+                            class="w-full border border-slate-300 rounded p-1 text-xs font-bold focus:outline-none focus:border-blue-500">
+                             <option value="共板(T)">共板(T)</option>
+                             <option value="フランジ(FG)">フランジ(FG)</option>
+                             </select>
+                    </div>
+                    <div class="col-span-2 flex items-center mt-1">
+                        <input type="checkbox" id="don1" onchange="drawAll()" class="w-4 h-4 mr-2">
+                        <label for="don1" class="text-[10px] text-slate-500 font-bold">A面ドン付け</label>
+                    </div>
+                     <div><label class="text-[10px] text-slate-400 font-bold">A 幅(W)</label><input type="number" id="w1" value="500"
+                            oninput="drawAll()"></div>
+                     <div><label class="text-[10px] text-slate-400 font-bold">A 高(H)</label><input type="number" id="h1" value="500"
+                            oninput="drawAll()"></div>
                 </div>
             </section>
 
             <section class="border-l-4 border-orange-500 pl-3">
                 <h3 class="text-xs font-bold text-orange-600 mb-2 uppercase tracking-tight">B面 (接続)</h3>
                 <div class="grid grid-cols-2 gap-3">
+                    <div class="col-span-2">
+                         <label class="text-[10px] text-slate-400 font-bold">B 工法</label>
+                         <select id="t2" onchange="drawAll()"
+                            class="w-full border border-slate-300 rounded p-1 text-xs font-bold focus:outline-none focus:border-orange-500">
+                             <option value="共板(T)">共板(T)</option>
+                             <option value="フランジ(FG)">フランジ(FG)</option>
+                             </select>
+                    </div>
+                    <div class="col-span-2 flex items-center mt-1">
+                        <input type="checkbox" id="don2" onchange="drawAll()" class="w-4 h-4 mr-2">
+                        <label for="don2" class="text-[10px] text-slate-500 font-bold">B面ドン付け</label>
+                    </div>
                     <div><label class="text-[10px] text-slate-400 font-bold">B 幅(W)</label><input type="number" id="w2" value="800" oninput="drawAll()"></div>
                     <div><label class="text-[10px] text-slate-400 font-bold">B 高(H)</label><input type="number" id="h2" value="300" oninput="drawAll()"></div>
                 </div>
@@ -213,8 +239,10 @@
         return {
             w1: parseFloat(document.getElementById('w1').value) || 0,
             h1: parseFloat(document.getElementById('h1').value) || 0,
+            t1: document.getElementById('don1').checked ? "ドン付け" : document.getElementById('t1').value,
             w2: parseFloat(document.getElementById('w2').value) || 0,
             h2: parseFloat(document.getElementById('h2').value) || 0,
+            t2: document.getElementById('don2').checked ? "ドン付け" : document.getElementById('t2').value,
             L: parseFloat(document.getElementById('L').value) || 0,
             offX: parseFloat(document.getElementById('offX').value) || 0,
             offY: parseFloat(document.getElementById('offY').value) || 0
@@ -222,12 +250,12 @@
     }
 
     function calculateOffsets(p) {
-        let cox = 0; 
+        let cox = 0;
         if (state.baseX === 'left') cox = (state.dirX === 'right' ? p.offX : -p.offX) - (p.w1 - p.w2) / 2;
         else if (state.baseX === 'right') cox = (state.dirX === 'right' ? p.offX : -p.offX) + (p.w1 - p.w2) / 2;
         else cox = (state.dirX === 'right' ? p.offX : -p.offX);
 
-        let coy = 0; 
+        let coy = 0;
         if (state.baseY === 'top') coy = (state.dirY === 'down' ? p.offY : -p.offY) - (p.h1 - p.h2) / 2;
         else if (state.baseY === 'bottom') coy = (state.dirY === 'down' ? p.offY : -p.offY) + (p.h1 - p.h2) / 2;
         else coy = (state.dirY === 'down' ? p.offY : -p.offY);
@@ -237,7 +265,7 @@
 
     function drawTick(ctx, x, y, angle) {
         const size = 6;
-        const slashAngle = angle + Math.PI / 4; 
+        const slashAngle = angle + Math.PI / 4;
         ctx.beginPath();
         ctx.moveTo(x - size * Math.cos(slashAngle), y - size * Math.sin(slashAngle));
         ctx.lineTo(x + size * Math.cos(slashAngle), y + size * Math.sin(slashAngle));
@@ -296,14 +324,14 @@
         const y_b = cy - (p.L/2)*sc, y_a = cy + (p.L/2)*sc;
         const x1_a = cx - cox*sc - (p.w1/2)*sc, x2_a = cx - cox*sc + (p.w1/2)*sc;
         const x3_b = cx - (p.w2/2)*sc, x4_b = cx + (p.w2/2)*sc;
-        
+
         ctx.beginPath(); ctx.lineWidth = 1.5; ctx.strokeStyle = "#1e293b";
-        ctx.moveTo(x1_a, y_a); ctx.lineTo(x2_a, y_a); ctx.lineTo(x4_b, y_b); ctx.lineTo(x3_b, y_b); ctx.closePath(); 
+        ctx.moveTo(x1_a, y_a); ctx.lineTo(x2_a, y_a); ctx.lineTo(x4_b, y_b); ctx.lineTo(x3_b, y_b); ctx.closePath();
         ctx.fillStyle = "#f8fafc"; ctx.fill(); ctx.stroke();
-        
+
         ctx.lineWidth = 4; ctx.strokeStyle = "#2563eb"; ctx.beginPath(); ctx.moveTo(x1_a, y_a); ctx.lineTo(x2_a, y_a); ctx.stroke();
         ctx.strokeStyle = "#ea580c"; ctx.beginPath(); ctx.moveTo(x3_b, y_b); ctx.lineTo(x4_b, y_b); ctx.stroke();
-        
+
         drawDim(ctx, x1_a, y_a, x2_a, y_a, `A幅: ${p.w1}`, 45);
         drawDim(ctx, x3_b, y_b, x4_b, y_b, `B幅: ${p.w2}`, -45);
         drawDim(ctx, x2_a, y_a, x2_a, y_b, `L: ${p.L}`, 65, true);
@@ -313,7 +341,7 @@
         ctx.save(); ctx.lineWidth = 1; ctx.setLineDash([4, 4]); ctx.strokeStyle = "#94a3b8";
         ctx.beginPath(); ctx.moveTo(rA, y_a); ctx.lineTo(rA, y_a + 95); ctx.stroke();
         ctx.beginPath(); ctx.moveTo(rB, y_b); ctx.lineTo(rB, y_a + 95); ctx.stroke();
-        ctx.setLineDash([]); ctx.strokeStyle = "#dc2626"; 
+        ctx.setLineDash([]); ctx.strokeStyle = "#dc2626";
         drawSlashDimLine(ctx, rA, y_a + 90, rB, y_a + 90);
         drawTextWithBg(ctx, `横振れ: ${p.offX}`, (rA+rB)/2, y_a + 90, "#dc2626");
         ctx.restore();
@@ -323,12 +351,13 @@
         const cx = w/2 - (cox*sc)/2, cy = h/2 - (coy*sc)/2;
         const xA = cx - (p.w1/2)*sc, yA = cy - (p.h1/2)*sc;
         const xB = cx + (cox - p.w2/2)*sc, yB = cy + (coy - p.h2/2)*sc;
-        
+
         ctx.lineWidth = 2.5; ctx.strokeStyle = "#2563eb"; ctx.strokeRect(xA, yA, p.w1*sc, p.h1*sc);
-        drawTextWithBg(ctx, `A: ${p.w1}×${p.h1}`, xA + (p.w1*sc)/2, yA + (p.h1*sc)/2, "#2563eb");
-        
+        drawTextWithBg(ctx, `A: ${p.w1}×${p.h1} (${p.t1})`, xA + (p.w1 * sc) / 2, yA + (p.h1 * sc) / 2, "#2563eb");
+
         ctx.setLineDash([6,4]); ctx.strokeStyle = "#ea580c"; ctx.strokeRect(xB, yB, p.w2*sc, p.h2*sc);
         ctx.setLineDash([]); drawTextWithBg(ctx, `B: ${p.w2}×${p.h2}`, xB + (p.w2*sc)/2, yB + (p.h2*sc)/2, "#ea580c");
+        drawTextWithBg(ctx, `B: ${p.w2}×${p.h2} (${p.t2})`, xB + (p.w2 * sc) / 2, yB + (p.h2 * sc) / 2, "#ea580c");
     }
 
     function drawSide(ctx, w, h, sc, p, coy) {
@@ -338,15 +367,15 @@
         const y3_b_top = cy + (coy - p.h2/2)*sc, y4_b_btm = cy + (coy + p.h2/2)*sc;
 
         ctx.beginPath(); ctx.lineWidth = 1.5; ctx.strokeStyle = "#1e293b";
-        ctx.moveTo(x_a, y1_a_top); ctx.lineTo(x_a, y2_a_btm); ctx.lineTo(x_b, y4_b_btm); ctx.lineTo(x_b, y3_b_top); ctx.closePath(); 
+        ctx.moveTo(x_a, y1_a_top); ctx.lineTo(x_a, y2_a_btm); ctx.lineTo(x_b, y4_b_btm); ctx.lineTo(x_b, y3_b_top); ctx.closePath();
         ctx.fillStyle = "#f8fafc"; ctx.fill(); ctx.stroke();
-        
+
         ctx.lineWidth = 4; ctx.strokeStyle = "#2563eb"; ctx.beginPath(); ctx.moveTo(x_a, y1_a_top); ctx.lineTo(x_a, y2_a_btm); ctx.stroke();
         ctx.strokeStyle = "#ea580c"; ctx.beginPath(); ctx.moveTo(x_b, y3_b_top); ctx.lineTo(x_b, y4_b_btm); ctx.stroke();
-        
+
         drawDim(ctx, x_a, y1_a_top, x_a, y2_a_btm, `A高: ${p.h1}`, -55, true);
         drawDim(ctx, x_b, y3_b_top, x_b, y4_b_btm, `B高: ${p.h2}`, 55, true);
-        
+
         const baselineY = Math.max(y2_a_btm, y4_b_btm) + 70;
         ctx.setLineDash([]); ctx.strokeStyle = "#475569"; ctx.lineWidth = 1;
         ctx.beginPath(); ctx.moveTo(x_a, y2_a_btm); ctx.lineTo(x_a, baselineY + 10); ctx.stroke();
@@ -408,12 +437,12 @@
             const { cox, coy } = calculateOffsets(p);
             const exportCanvas = document.getElementById('exportCanvas');
             const ectx = exportCanvas.getContext('2d');
-            
+
             exportCanvas.width = 1200;
             exportCanvas.height = 1650;
             ectx.fillStyle = "#ffffff";
             ectx.fillRect(0, 0, 1200, 1650);
-            
+
             ectx.fillStyle = "#0f172a";
             ectx.fillRect(0, 0, 1200, 120);
             ectx.fillStyle = "#ffffff";
@@ -436,12 +465,12 @@
                 baseX: { left: '左', center: '芯', right: '右' },
                 dirX: { left: '左へ', right: '右へ' }
             };
-            ectx.fillText(`A面寸法: W${p.w1} × H${p.h1}`, 80, 210);
-            ectx.fillText(`B面寸法: W${p.w2} × H${p.h2}`, 400, 210);
-            ectx.fillText(`全長 L: ${p.L}`, 720, 210);
+            ectx.fillText(`A面: W${p.w1}×H${p.h1} [${p.t1}]`, 80, 200);
+            ectx.fillText(`B面: W${p.w2}×H${p.h2} [${p.t2}]`, 550, 200);
+            ectx.fillText(`全長 L: ${p.L}`, 80, 265);
             ectx.font = "22px sans-serif";
-            ectx.fillText(`横振れ(X): ${labels.baseX[state.baseX]}基準 / ${p.offX} / ${labels.dirX[state.dirX]}`, 80, 280);
-            ectx.fillText(`縦振れ(Y): ${labels.baseY[state.baseY]}基準 / ${p.offY} / ${labels.dirY[state.dirY]}`, 550, 280);
+            ectx.fillText(`横振れ(X): ${labels.baseX[state.baseX]}基準 / ${p.offX} / ${labels.dirX[state.dirX]}`, 80, 315);
+            ectx.fillText(`縦振れ(Y): ${labels.baseY[state.baseY]}基準 / ${p.offY} / ${labels.dirY[state.dirY]}`, 550, 315);
 
             const drawOnExport = (id, x, y, w, h, type, drawFn) => {
                 ectx.save();
@@ -471,7 +500,7 @@
             link.href = dataUrl;
             link.download = `duct_spec_${Date.now()}.png`;
             link.click();
-            
+
         } catch (err) {
             console.error(err);
         } finally {
