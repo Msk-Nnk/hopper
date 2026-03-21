@@ -582,10 +582,12 @@
                     ectx.fillText(label, x, y - 10);
                 };
 
+                // 各図面の描画実行
                 drawOnExport('top', 50, 400, 535, 450, 'top', (ctx, w, h, sc) => drawTop(ctx, w, h, sc, p, cox, coy));
                 drawOnExport('front', 615, 400, 535, 450, 'front', (ctx, w, h, sc) => drawFront(ctx, w, h, sc, p, cox, coy));
-                drawOnExport('side', 50, 930, 535, 450, 'side', (ctx, w, h, sc) => drawSide(ctx, w, h, sc, p, coy));
-                drawOnExport('3d', 615, 930, 535, 450, '3d', (ctx, w, h, sc) => draw3D(ctx, w, h, sc, p, cox, coy));
+
+                // 側面図を横幅 1100 に拡大（右下の余白まで広げる）
+                drawOnExport('side', 50, 930, 1100, 450, 'side', (ctx, w, h, sc) => drawSide(ctx, w, h, sc, p, coy));
 
                 const dataUrl = exportCanvas.toDataURL('image/png');
                 document.getElementById('previewImage').src = dataUrl;
