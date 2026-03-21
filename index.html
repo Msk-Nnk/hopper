@@ -444,18 +444,45 @@
 
     function draw3D(ctx, w, h, sc, p, cox, coy) {
         const project = (x, y, z) => {
-            // Y軸回転
             let x1 = x * Math.cos(state.rotY) + z * Math.sin(state.rotY);
             let z1 = -x * Math.sin(state.rotY) + z * Math.cos(state.rotY);
-            // X軸回転
             let y2 = y * Math.cos(state.rotX) - z1 * Math.sin(state.rotX);
             let z2 = y * Math.sin(state.rotX) + z1 * Math.cos(state.rotX);
-            return {
-                px: w / 2 + x1 * sc,
-                py: h / 2 + y2 * sc
-            };
+            return { px: w / 2 + x1 * sc, py: h / 2 + y2 * sc };
         };
 
+        // --- 正方形の空間グリッド（100mmピッチ） ---
+        // ダクトの各寸法から空間のサイズを決定
+        const maxDim = Math.max(p.w1, p.h1, p.w2, p.h2, p.L, Math.abs(cox), Math.abs(coy)) * 1.2;
+        const limit = Math.ceil(maxDim / 200) * 100;
+        const gridStep = 100;
+
+        ctx.save();
+        ctx.lineWidth = 0.5;
+        ctx.strokeStyle = "rgba(148, 163, 184, 0.15)";
+
+        for (let i = -limit; i <= limit; i += gridStep) {
+            // 底面 (XZ平面)
+            let xz1 = project(-limit, limit, i), xz2 = project(limit, limit, i);
+            let xz3 = project(i, limit, -limit), xz4 = project(i, limit, limit);
+            ctx.beginPath(); ctx.moveTo(xz1.px, xz1.py); ctx.lineTo(xz2.px, xz2.py); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(xz3.px, xz3.py); ctx.lineTo(xz4.px, xz4.py); ctx.stroke();
+
+            // 背面 (XY平面)
+            let xy1 = project(-limit, i, -limit), xy2 = project(limit, i, -limit);
+            let xy3 = project(i, -limit, -limit), xy4 = project(i, limit, -limit);
+            ctx.beginPath(); ctx.moveTo(xy1.px, xy1.py); ctx.lineTo(xy2.px, xy2.py); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(xy3.px, xy3.py); ctx.lineTo(xy4.px, xy4.py); ctx.stroke();
+
+            // 側面 (YZ平面)
+            let yz1 = project(-limit, -limit, i), yz2 = project(-limit, limit, i);
+            let yz3 = project(-limit, i, -limit), yz4 = project(-limit, i, limit);
+            ctx.beginPath(); ctx.moveTo(yz1.px, yz1.py); ctx.lineTo(yz2.px, yz2.py); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(yz3.px, yz3.py); ctx.lineTo(yz4.px, yz4.py); ctx.stroke();
+        }
+        ctx.restore();
+
+        // ダクト本体の描画
         const xA1 = -p.w1 / 2 - cox / 2, xA2 = p.w1 / 2 - cox / 2, yA1 = -p.h1 / 2 - coy / 2, yA2 = p.h1 / 2 - coy / 2;
         const xB1 = -p.w2 / 2 + cox / 2, xB2 = p.w2 / 2 + cox / 2, yB1 = -p.h2 / 2 + coy / 2, yB2 = p.h2 / 2 + coy / 2;
         const zA = p.L / 2, zB = -p.L / 2;
