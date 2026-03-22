@@ -273,7 +273,7 @@
             dirX: { left: '左へ', right: '右へ' }
         };
 
-    let state = { baseX: 'left', baseY: 'center', dirX: 'right', dirY: 'down', rotX: -0.5, rotY: 0.5 };
+        let state = { baseX: 'left', baseY: 'center', dirX: 'right', dirY: 'down', rotX: -0.5, rotY: 0.5 };
 
         function setParam(key, val) {
             state[key] = val;
@@ -442,99 +442,99 @@
             ctx.restore();
         }
 
-    function draw3D(ctx, w, h, sc, p, cox, coy) {
-        const project = (x, y, z) => {
-            let x1 = x * Math.cos(state.rotY) + z * Math.sin(state.rotY);
-            let z1 = -x * Math.sin(state.rotY) + z * Math.cos(state.rotY);
-            let y2 = y * Math.cos(state.rotX) - z1 * Math.sin(state.rotX);
-            let z2 = y * Math.sin(state.rotX) + z1 * Math.cos(state.rotX);
-            return { px: w / 2 + x1 * sc, py: h / 2 + y2 * sc };
-        };
+        function draw3D(ctx, w, h, sc, p, cox, coy) {
+            const project = (x, y, z) => {
+                let x1 = x * Math.cos(state.rotY) + z * Math.sin(state.rotY);
+                let z1 = -x * Math.sin(state.rotY) + z * Math.cos(state.rotY);
+                let y2 = y * Math.cos(state.rotX) - z1 * Math.sin(state.rotX);
+                let z2 = y * Math.sin(state.rotX) + z1 * Math.cos(state.rotX);
+                return { px: w / 2 + x1 * sc, py: h / 2 + y2 * sc };
+            };
 
-        // --- 正方形の空間グリッド（100mmピッチ） ---
-        // ダクトの各寸法から空間のサイズを決定
-        const maxDim = Math.max(p.w1, p.h1, p.w2, p.h2, p.L, Math.abs(cox), Math.abs(coy)) * 1.2;
-        const limit = Math.ceil(maxDim / 200) * 100;
-        const gridStep = 100;
+            // --- 正方形の空間グリッド（100mmピッチ） ---
+            // ダクトの各寸法から空間のサイズを決定
+            const maxDim = Math.max(p.w1, p.h1, p.w2, p.h2, p.L, Math.abs(cox), Math.abs(coy)) * 1.2;
+            const limit = Math.ceil(maxDim / 200) * 100;
+            const gridStep = 100;
 
-        ctx.save();
-        ctx.lineWidth = 0.5;
-        ctx.strokeStyle = "rgba(148, 163, 184, 0.15)";
+            ctx.save();
+            ctx.lineWidth = 0.5;
+            ctx.strokeStyle = "rgba(148, 163, 184, 0.15)";
 
-        for (let i = -limit; i <= limit; i += gridStep) {
-            // 底面 (XZ平面)
-            let xz1 = project(-limit, limit, i), xz2 = project(limit, limit, i);
-            let xz3 = project(i, limit, -limit), xz4 = project(i, limit, limit);
-            ctx.beginPath(); ctx.moveTo(xz1.px, xz1.py); ctx.lineTo(xz2.px, xz2.py); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(xz3.px, xz3.py); ctx.lineTo(xz4.px, xz4.py); ctx.stroke();
+            for (let i = -limit; i <= limit; i += gridStep) {
+                // 底面 (XZ平面)
+                let xz1 = project(-limit, limit, i), xz2 = project(limit, limit, i);
+                let xz3 = project(i, limit, -limit), xz4 = project(i, limit, limit);
+                ctx.beginPath(); ctx.moveTo(xz1.px, xz1.py); ctx.lineTo(xz2.px, xz2.py); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(xz3.px, xz3.py); ctx.lineTo(xz4.px, xz4.py); ctx.stroke();
 
-            // 背面 (XY平面)
-            let xy1 = project(-limit, i, -limit), xy2 = project(limit, i, -limit);
-            let xy3 = project(i, -limit, -limit), xy4 = project(i, limit, -limit);
-            ctx.beginPath(); ctx.moveTo(xy1.px, xy1.py); ctx.lineTo(xy2.px, xy2.py); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(xy3.px, xy3.py); ctx.lineTo(xy4.px, xy4.py); ctx.stroke();
+                // 背面 (XY平面)
+                let xy1 = project(-limit, i, -limit), xy2 = project(limit, i, -limit);
+                let xy3 = project(i, -limit, -limit), xy4 = project(i, limit, -limit);
+                ctx.beginPath(); ctx.moveTo(xy1.px, xy1.py); ctx.lineTo(xy2.px, xy2.py); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(xy3.px, xy3.py); ctx.lineTo(xy4.px, xy4.py); ctx.stroke();
 
-            // 側面 (YZ平面)
-            let yz1 = project(-limit, -limit, i), yz2 = project(-limit, limit, i);
-            let yz3 = project(-limit, i, -limit), yz4 = project(-limit, i, limit);
-            ctx.beginPath(); ctx.moveTo(yz1.px, yz1.py); ctx.lineTo(yz2.px, yz2.py); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(yz3.px, yz3.py); ctx.lineTo(yz4.px, yz4.py); ctx.stroke();
+                // 側面 (YZ平面)
+                let yz1 = project(-limit, -limit, i), yz2 = project(-limit, limit, i);
+                let yz3 = project(-limit, i, -limit), yz4 = project(-limit, i, limit);
+                ctx.beginPath(); ctx.moveTo(yz1.px, yz1.py); ctx.lineTo(yz2.px, yz2.py); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(yz3.px, yz3.py); ctx.lineTo(yz4.px, yz4.py); ctx.stroke();
+            }
+            ctx.restore();
+
+            // ダクト本体の描画
+            const xA1 = -p.w1 / 2 - cox / 2, xA2 = p.w1 / 2 - cox / 2, yA1 = -p.h1 / 2 - coy / 2, yA2 = p.h1 / 2 - coy / 2;
+            const xB1 = -p.w2 / 2 + cox / 2, xB2 = p.w2 / 2 + cox / 2, yB1 = -p.h2 / 2 + coy / 2, yB2 = p.h2 / 2 + coy / 2;
+            const zA = p.L / 2, zB = -p.L / 2;
+
+            const pA = [project(xA1, yA1, zA), project(xA2, yA1, zA), project(xA2, yA2, zA), project(xA1, yA2, zA)];
+            const pB = [project(xB1, yB1, zB), project(xB2, yB1, zB), project(xB2, yB2, zB), project(xB1, yB2, zB)];
+
+            ctx.beginPath(); ctx.setLineDash([2, 2]); ctx.strokeStyle = "#cbd5e1";
+            for (let i = 0; i < 4; i++) { ctx.moveTo(pA[i].px, pA[i].py); ctx.lineTo(pB[i].px, pB[i].py); }
+            ctx.stroke(); ctx.setLineDash([]);
+
+            ctx.beginPath(); ctx.fillStyle = "rgba(248, 250, 252, 0.6)";
+            ctx.moveTo(pA[0].px, pA[0].py); ctx.lineTo(pA[1].px, pA[1].py); ctx.lineTo(pB[1].px, pB[1].py); ctx.lineTo(pB[0].px, pB[0].py); ctx.closePath(); ctx.fill();
+            ctx.moveTo(pA[1].px, pA[1].py); ctx.lineTo(pA[2].px, pA[2].py); ctx.lineTo(pB[2].px, pB[2].py); ctx.lineTo(pB[1].px, pB[1].py); ctx.closePath(); ctx.fill();
+
+            ctx.beginPath(); ctx.lineWidth = 1; ctx.strokeStyle = "#94a3b8";
+            for (let i = 0; i < 4; i++) {
+                ctx.moveTo(pA[i].px, pA[i].py); ctx.lineTo(pB[i].px, pB[i].py);
+                ctx.moveTo(pA[i].px, pA[i].py); ctx.lineTo(pA[(i + 1) % 4].px, pA[(i + 1) % 4].py);
+                ctx.moveTo(pB[i].px, pB[i].py); ctx.lineTo(pB[(i + 1) % 4].px, pB[(i + 1) % 4].py);
+            }
+            ctx.stroke();
+
+            ctx.lineWidth = 3; ctx.strokeStyle = "#2563eb"; ctx.beginPath();
+            pA.forEach((pt, i) => i === 0 ? ctx.moveTo(pt.px, pt.py) : ctx.lineTo(pt.px, pt.py)); ctx.closePath(); ctx.stroke();
+            ctx.strokeStyle = "#ea580c"; ctx.beginPath();
+            pB.forEach((pt, i) => i === 0 ? ctx.moveTo(pt.px, pt.py) : ctx.lineTo(pt.px, pt.py)); ctx.closePath(); ctx.stroke();
         }
-        ctx.restore();
 
-        // ダクト本体の描画
-        const xA1 = -p.w1 / 2 - cox / 2, xA2 = p.w1 / 2 - cox / 2, yA1 = -p.h1 / 2 - coy / 2, yA2 = p.h1 / 2 - coy / 2;
-        const xB1 = -p.w2 / 2 + cox / 2, xB2 = p.w2 / 2 + cox / 2, yB1 = -p.h2 / 2 + coy / 2, yB2 = p.h2 / 2 + coy / 2;
-        const zA = p.L / 2, zB = -p.L / 2;
+        function render(id, drawFn, type) {
+            const canvas = document.getElementById(id);
+            const ctx = canvas.getContext('2d');
+            const dpr = window.devicePixelRatio || 1;
+            const rect = canvas.parentElement.getBoundingClientRect();
+            canvas.style.width = rect.width + "px";
+            canvas.style.height = rect.height + "px";
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.resetTransform();
+            ctx.scale(dpr, dpr);
+            ctx.clearRect(0, 0, rect.width, rect.height);
+            const p = getParams();
+            const { cox, coy } = calculateOffsets(p);
+            const boxW = Math.max(p.w1, p.w2, Math.abs(cox) + (p.w1 + p.w2) / 2, p.L);
+            const boxH = Math.max(p.h1, p.h2, Math.abs(coy) + (p.h1 + p.h2) / 2, p.L);
 
-        const pA = [project(xA1, yA1, zA), project(xA2, yA1, zA), project(xA2, yA2, zA), project(xA1, yA2, zA)];
-        const pB = [project(xB1, yB1, zB), project(xB2, yB1, zB), project(xB2, yB2, zB), project(xB1, yB2, zB)];
+            // 3Dプレビューのみマージンを小さく(1.8)して拡大表示
+            const margin = type === 'side' ? 3.0 : (type === '3d' ? 1.8 : 2.5);
 
-        ctx.beginPath(); ctx.setLineDash([2, 2]); ctx.strokeStyle = "#cbd5e1";
-        for (let i = 0; i < 4; i++) { ctx.moveTo(pA[i].px, pA[i].py); ctx.lineTo(pB[i].px, pB[i].py); }
-        ctx.stroke(); ctx.setLineDash([]);
-
-        ctx.beginPath(); ctx.fillStyle = "rgba(248, 250, 252, 0.6)";
-        ctx.moveTo(pA[0].px, pA[0].py); ctx.lineTo(pA[1].px, pA[1].py); ctx.lineTo(pB[1].px, pB[1].py); ctx.lineTo(pB[0].px, pB[0].py); ctx.closePath(); ctx.fill();
-        ctx.moveTo(pA[1].px, pA[1].py); ctx.lineTo(pA[2].px, pA[2].py); ctx.lineTo(pB[2].px, pB[2].py); ctx.lineTo(pB[1].px, pB[1].py); ctx.closePath(); ctx.fill();
-
-        ctx.beginPath(); ctx.lineWidth = 1; ctx.strokeStyle = "#94a3b8";
-        for (let i = 0; i < 4; i++) {
-            ctx.moveTo(pA[i].px, pA[i].py); ctx.lineTo(pB[i].px, pB[i].py);
-            ctx.moveTo(pA[i].px, pA[i].py); ctx.lineTo(pA[(i + 1) % 4].px, pA[(i + 1) % 4].py);
-            ctx.moveTo(pB[i].px, pB[i].py); ctx.lineTo(pB[(i + 1) % 4].px, pB[(i + 1) % 4].py);
+            const sc = Math.min(rect.width, rect.height) / (Math.max(boxW, boxH) * margin);
+            drawFn(ctx, rect.width, rect.height, sc);
         }
-        ctx.stroke();
-
-        ctx.lineWidth = 3; ctx.strokeStyle = "#2563eb"; ctx.beginPath();
-        pA.forEach((pt, i) => i === 0 ? ctx.moveTo(pt.px, pt.py) : ctx.lineTo(pt.px, pt.py)); ctx.closePath(); ctx.stroke();
-        ctx.strokeStyle = "#ea580c"; ctx.beginPath();
-        pB.forEach((pt, i) => i === 0 ? ctx.moveTo(pt.px, pt.py) : ctx.lineTo(pt.px, pt.py)); ctx.closePath(); ctx.stroke();
-    }
-
-    function render(id, drawFn, type) {
-        const canvas = document.getElementById(id);
-        const ctx = canvas.getContext('2d');
-        const dpr = window.devicePixelRatio || 1;
-        const rect = canvas.parentElement.getBoundingClientRect();
-        canvas.style.width = rect.width + "px";
-        canvas.style.height = rect.height + "px";
-        canvas.width = rect.width * dpr;
-        canvas.height = rect.height * dpr;
-        ctx.resetTransform();
-        ctx.scale(dpr, dpr);
-        ctx.clearRect(0, 0, rect.width, rect.height);
-        const p = getParams();
-        const { cox, coy } = calculateOffsets(p);
-        const boxW = Math.max(p.w1, p.w2, Math.abs(cox) + (p.w1 + p.w2) / 2, p.L);
-        const boxH = Math.max(p.h1, p.h2, Math.abs(coy) + (p.h1 + p.h2) / 2, p.L);
-
-        // 3Dプレビューのみマージンを小さく(1.8)して拡大表示
-        const margin = type === 'side' ? 3.0 : (type === '3d' ? 1.8 : 2.5);
-
-        const sc = Math.min(rect.width, rect.height) / (Math.max(boxW, boxH) * margin);
-        drawFn(ctx, rect.width, rect.height, sc);
-    }
 
         function drawAll() {
             render('topView', (ctx, w, h, sc) => drawTop(ctx, w, h, sc, getParams(), calculateOffsets(getParams()).cox, calculateOffsets(getParams()).coy), 'top');
@@ -670,43 +670,43 @@
         }
 
 
-    function init3DControl() {
-        const canvas = document.getElementById('threeDView');
-        let isDragging = false;
-        let lastPos = { x: 0, y: 0 };
+        function init3DControl() {
+            const canvas = document.getElementById('threeDView');
+            let isDragging = false;
+            let lastPos = { x: 0, y: 0 };
 
-        const start = (e) => {
-            isDragging = true;
-            const pos = e.touches ? e.touches[0] : e;
-            lastPos = { x: pos.clientX, y: pos.clientY };
+            const start = (e) => {
+                isDragging = true;
+                const pos = e.touches ? e.touches[0] : e;
+                lastPos = { x: pos.clientX, y: pos.clientY };
+            };
+
+            const move = (e) => {
+                if (!isDragging) return;
+                const pos = e.touches ? e.touches[0] : e;
+                const dx = pos.clientX - lastPos.x;
+                const dy = pos.clientY - lastPos.y;
+                state.rotY += dx * 0.01;
+                state.rotX -= dy * 0.01;
+                lastPos = { x: pos.clientX, y: pos.clientY };
+                drawAll();
+                if (e.touches) e.preventDefault();
+            };
+
+            const end = () => isDragging = false;
+
+            canvas.addEventListener('mousedown', start);
+            window.addEventListener('mousemove', move);
+            window.addEventListener('mouseup', end);
+            canvas.addEventListener('touchstart', start, { passive: false });
+            window.addEventListener('touchmove', move, { passive: false });
+            window.addEventListener('touchend', end);
+        }
+
+        window.onload = () => {
+            setTimeout(drawAll, 300);
+            init3DControl();
         };
-
-        const move = (e) => {
-            if (!isDragging) return;
-            const pos = e.touches ? e.touches[0] : e;
-            const dx = pos.clientX - lastPos.x;
-            const dy = pos.clientY - lastPos.y;
-            state.rotY += dx * 0.01;
-            state.rotX -= dy * 0.01;
-            lastPos = { x: pos.clientX, y: pos.clientY };
-            drawAll();
-            if (e.touches) e.preventDefault();
-        };
-
-        const end = () => isDragging = false;
-
-        canvas.addEventListener('mousedown', start);
-        window.addEventListener('mousemove', move);
-        window.addEventListener('mouseup', end);
-        canvas.addEventListener('touchstart', start, { passive: false });
-        window.addEventListener('touchmove', move, { passive: false });
-        window.addEventListener('touchend', end);
-    }
-
-    window.onload = () => {
-        setTimeout(drawAll, 300);
-        init3DControl();
-    };
         window.onresize = () => drawAll();
     </script>
 
