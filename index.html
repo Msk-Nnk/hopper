@@ -200,6 +200,13 @@
                     </div>
                 </section>
 
+                <section>
+                    <h3 class="text-xs font-bold text-slate-600 mb-2">備考 (メモ)</h3>
+                    <textarea id="memo" rows="2" oninput="drawAll()"
+                        class="w-full border border-slate-300 rounded-lg p-3 text-sm focus:outline-none focus:border-slate-500"
+                        placeholder="例：現場名称、注文番号など"></textarea>
+                </section>
+
                 <div class="pt-4 pb-8">
                     <button id="saveBtn" onclick="exportOrderImage()"
                         class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-4 px-6 rounded-xl flex items-center justify-center transition-all shadow-xl active:scale-95">
@@ -294,7 +301,8 @@
                 t2: document.getElementById('don2').checked ? "ドン付け" : document.getElementById('t2').value,
                 L: parseFloat(document.getElementById('L').value) || 0,
                 offX: parseFloat(document.getElementById('offX').value) || 0,
-                offY: parseFloat(document.getElementById('offY').value) || 0
+                offY: parseFloat(document.getElementById('offY').value) || 0,
+                memo: document.getElementById('memo').value || "" // ここを追加
             };
         }
 
@@ -576,17 +584,27 @@
                 ectx.textAlign = "left";
 
                 ectx.fillStyle = "#f8fafc";
-                ectx.fillRect(50, 150, 1100, 180);
+                ectx.fillRect(50, 135, 1100, 245);
                 ectx.strokeStyle = "#cbd5e1";
-                ectx.strokeRect(50, 150, 1100, 180);
+                ectx.strokeRect(50, 135, 1100, 245);
+
                 ectx.fillStyle = "#1e293b";
                 ectx.font = "bold 24px sans-serif";
-                ectx.fillText(`A面: W${p.w1}×H${p.h1} [${p.t1}]`, 80, 200);
-                ectx.fillText(`B面: W${p.w2}×H${p.h2} [${p.t2}]`, 550, 200);
-                ectx.fillText(`全長 L: ${p.L}`, 80, 265);
+                ectx.fillText(`A面: W${p.w1}×H${p.h1} [${p.t1}]`, 80, 180);
+                ectx.fillText(`B面: W${p.w2}×H${p.h2} [${p.t2}]`, 550, 180);
+                ectx.fillText(`全長 L: ${p.L}`, 80, 240);
                 ectx.font = "22px sans-serif";
-                ectx.fillText(`横振れ(X): ${UI_LABELS.baseX[state.baseX]}基準 / ${p.offX} / ${UI_LABELS.dirX[state.dirX]}`, 80, 315);
-                ectx.fillText(`縦振れ(Y): ${UI_LABELS.baseY[state.baseY]}基準 / ${p.offY} / ${UI_LABELS.dirY[state.dirY]}`, 550, 315);
+                ectx.fillText(`横振れ(X): ${UI_LABELS.baseX[state.baseX]}基準 / ${p.offX} / ${UI_LABELS.dirX[state.dirX]}`, 80, 285);
+                ectx.fillText(`縦振れ(Y): ${UI_LABELS.baseY[state.baseY]}基準 / ${p.offY} / ${UI_LABELS.dirY[state.dirY]}`, 550, 285);
+
+                if (p.memo) {
+                    ectx.fillStyle = "#64748b";
+                    ectx.font = "bold 18px sans-serif";
+                    ectx.fillText("備考:", 80, 340);
+                    ectx.font = "20px sans-serif";
+                    ectx.fillStyle = "#1e293b";
+                    ectx.fillText(p.memo, 140, 340);
+                }
 
                 const drawOnExport = (id, x, y, w, h, type, drawFn) => {
                     ectx.save();
@@ -610,8 +628,8 @@
                 };
 
                 // 各図面の描画実行
-                drawOnExport('top', 50, 400, 535, 450, 'top', (ctx, w, h, sc) => drawTop(ctx, w, h, sc, p, cox, coy));
-                drawOnExport('front', 615, 400, 535, 450, 'front', (ctx, w, h, sc) => drawFront(ctx, w, h, sc, p, cox, coy));
+                drawOnExport('top', 50, 430, 535, 450, 'top', (ctx, w, h, sc) => drawTop(ctx, w, h, sc, p, cox, coy));
+                drawOnExport('front', 615, 430, 535, 450, 'front', (ctx, w, h, sc) => drawFront(ctx, w, h, sc, p, cox, coy));
 
                 // 側面図を横幅 1100 に拡大（右下の余白まで広げる）
                 drawOnExport('side', 50, 930, 1100, 450, 'side', (ctx, w, h, sc) => drawSide(ctx, w, h, sc, p, coy));
